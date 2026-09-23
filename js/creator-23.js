@@ -5003,10 +5003,13 @@ const cardDB = {
 	open() {
 		if (this.db) {return Promise.resolve(this.db);}
 		return new Promise((resolve, reject) => {
-			var request = indexedDB.open('CardConjurerDB', 1);
+			var request = indexedDB.open('CardConjurerDB', 2);
 			request.onupgradeneeded = event => {
 				if (!event.target.result.objectStoreNames.contains('cards')) {
 					event.target.result.createObjectStore('cards');
+				}
+				if (!event.target.result.objectStoreNames.contains('framePresets')) {
+					event.target.result.createObjectStore('framePresets');
 				}
 			};
 			request.onsuccess = event => {
@@ -5016,39 +5019,47 @@ const cardDB = {
 			request.onerror = event => reject(event.target.error);
 		});
 	},
-	async set(key, value) {
+	async set(key, value, store = 'cards') {
 		var db = await this.open();
 		return new Promise((resolve, reject) => {
-			var tx = db.transaction('cards', 'readwrite');
-			tx.objectStore('cards').put(value, key);
+			var tx = db.transaction(store, 'readwrite');
+			tx.objectStore(store).put(value, key);
 			tx.oncomplete = () => resolve();
 			tx.onerror = event => reject(event.target.error);
 		});
 	},
-	async get(key) {
+	async get(key, store = 'cards') {
 		var db = await this.open();
 		return new Promise((resolve, reject) => {
-			var request = db.transaction('cards', 'readonly').objectStore('cards').get(key);
+			var request = db.transaction(store, 'readonly').objectStore(store).get(key);
 			request.onsuccess = () => resolve(request.result);
 			request.onerror = event => reject(event.target.error);
 		});
 	},
-	async delete(key) {
+	async delete(key, store = 'cards') {
 		var db = await this.open();
 		return new Promise((resolve, reject) => {
-			var tx = db.transaction('cards', 'readwrite');
-			tx.objectStore('cards').delete(key);
+			var tx = db.transaction(store, 'readwrite');
+			tx.objectStore(store).delete(key);
 			tx.oncomplete = () => resolve();
 			tx.onerror = event => reject(event.target.error);
 		});
 	},
-	async clear() {
+	async clear(store = 'cards') {
 		var db = await this.open();
 		return new Promise((resolve, reject) => {
-			var tx = db.transaction('cards', 'readwrite');
-			tx.objectStore('cards').clear();
+			var tx = db.transaction(store, 'readwrite');
+			tx.objectStore(store).clear();
 			tx.oncomplete = () => resolve();
 			tx.onerror = event => reject(event.target.error);
+		});
+	},
+	async keys(store = 'cards') {
+		var db = await this.open();
+		return new Promise((resolve, reject) => {
+			var request = db.transaction(store, 'readonly').objectStore(store).getAllKeys();
+			request.onsuccess = () => resolve(request.result);
+			request.onerror = event => reject(event.target.error);
 		});
 	}
 };
