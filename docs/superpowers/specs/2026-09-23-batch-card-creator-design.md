@@ -179,13 +179,17 @@ New tab, "Batch", next to Export (same `toggleCreatorTabs` mechanism,
     format is a task for whoever is preparing the batch input (may be
     done conversationally, outside the app).
 
-- "Parse" button → splits the textarea into rows, renders a preview
-  `<table>` below: row #, cardname (with set/number suffix shown if
-  given, e.g. "Kaalia of the Vast (MH3 #343)"), nickname (or "—"),
-  preset name with ✅/❌ (checked against a fresh
+- "Parse" button → splits the textarea into rows, builds a
+  `batchRows` array (`{cardname, setCode, collectorNumber, nickname,
+  presetName, artFlag, status: 'pending'}` per row — `status` is what
+  the summary/retry features below read and update), renders a
+  preview `<table>` below: row #, cardname (with set/number suffix
+  shown if given, e.g. "Kaalia of the Vast (MH3 #343)"), nickname (or
+  "—"), preset name with ✅/❌ (checked against a fresh
   `cardDB.keys('framePresets')` read), art-flag with ✅/❌ (valid only
-  if exactly `art` or `no-art`, case-insensitive). A row failing
-  either check is styled red and excluded from the run. `SetCode`/
+  if exactly `art` or `no-art`, case-insensitive), and a Status
+  column (blank until a run starts). A row failing the preset/art-flag
+  check is styled red and excluded from the run. `SetCode`/
   `CollectorNumber` are never validated at parse time (Scryfall is the
   only source of truth for whether they match a real print) — a bad
   set/number is only caught when the row actually runs, per step 2
@@ -195,7 +199,111 @@ New tab, "Batch", next to Export (same `toggleCreatorTabs` mechanism,
   parsed and is valid. Runs rows sequentially (never in parallel —
   see Error Handling below for why). Shows a simple progress line
   ("Processing 3 / 12: Lightning Bolt...") above the table, updated
-  per row.
+  per row, and updates each row's Status cell live (⏳ running, ✅
+  done, ❌ + reason) as it goes.
+
+- "Stop" button — appears only while a run is in progress, next to
+  the progress line. Sets a module-level `batchCancelled = true` flag.
+  The run loop (per-row processing, below) checks this flag once
+  *between* rows — after the current row's 800ms inter-row delay
+  finishes, before starting the next row — and exits the loop if set.
+  It does not interrupt a row already in progress (no clean way to
+  abort a row mid-Scryfall-fetch/mid-download without leaving `card`
+  in a half-applied state); the in-flight row always finishes first.
+  Stopping still produces the end-of-run summary below, scoped to
+  whatever ran before the stop.
+
+- **End-of-run summary** — rendered above the table once a run
+  finishes or is stopped: counts ("14 succeeded, 2 skipped, 1
+  stopped before running") plus a list of every non-success row with
+  its reason (the same message the per-row `notify()` call used —
+  see Error Handling). Stays on screen until the next "Parse" or "Run
+  Batch" click clears it.
+
+- **Retry** — each failed row's Status cell gets a small "Retry"
+  button once the run finishes. Clicking it re-runs just that one row
+  through the same per-row pipeline (step 1-6 below) and updates its
+  Status cell + the summary counts in place — no need to re-run the
+  whole batch for one bad row.
+
+- **Run Remaining** — appears in the summary once a run was stopped
+  or partially failed: re-runs only rows whose `status` is not yet
+  `'success'` (i.e. `'pending'` rows never reached because of a Stop,
+  plus any `'error'` rows), in their original order, without
+  re-running rows that already succeeded.
+
+### Persistence: saving a batch list
+
+New IndexedDB object store `batchLists` (same `CardConjurerDB`,
+alongside `cards` and `framePresets`, bumping the DB version again —
+same pattern as the `framePresets` store's own addition: guard
+creation with `objectStoreNames.contains` in `onupgradeneeded` so
+existing data in the other two stores is untouched). Key = list name,
+value = the raw textarea string (no need to store the parsed
+`batchRows` — re-parsing on load is cheap and keeps this store
+trivial: one string per name).
+
+UI, in the Batch tab, mirroring the frame-preset save/load/delete
+pattern already built:
+- "Save Batch List" button → `prompt()` for a name → same
+  overwrite/duplicate-name flow as `saveFramePreset()` → stores the
+  current textarea content.
+- `<select>` of saved list names + "Load" button → replaces the
+  textarea content with the stored string (does not auto-parse; user
+  still clicks "Parse" same as with freshly-typed input).
+- "Delete" button → removes the selected saved list.
+
+### Filenames: avoiding collisions across prints
+
+`exportVariant(skipArt, skipFrame, suffix)` (Export tab, already
+merged) always names files from `getCardName()` alone — two different
+prints of the same title (e.g. a reprint) produce identical filenames
+and silently overwrite each other in the browser's downloads. Batch
+gains a 4th, optional parameter:
+
+```js
+function exportVariant(skipArt, skipFrame, suffix, nameOverride) {
+	drawCard(skipArt, skipFrame);
+	var imageDataURL = cardCanvas.toDataURL('image/png');
+	var imageName = (nameOverride || getCardName()) + suffix + '.png';
+	...
+}
+```
+
+(Existing Export tab call sites — `exportFrameAndText()`,
+`exportTextOnly()` — pass no 4th argument, so `nameOverride` is
+`undefined` and behavior is unchanged; only batch's per-row export
+step passes one.)
+
+Per row, batch computes:
+
+```js
+var batchNameBase = getCardName() +
+	(row.setCode ? ' (' + row.setCode.toUpperCase() +
+		(row.collectorNumber ? ' #' + row.collectorNumber.trim() : '') +
+	')' : '');
+```
+
+and exports all three files with it:
+
+```js
+exportVariant(false, false, '', batchNameBase);   // full card — see note below
+exportVariant(true, false, '-frame', batchNameBase);
+exportVariant(true, true, '-textonly', batchNameBase);
+```
+
+Note: this uses `exportVariant(false, false, ...)` for the "full
+card" file instead of calling `downloadCard()` directly, because
+`downloadCard()` has no filename-override parameter and always names
+from `getCardName()` alone. The one behavioral difference this
+introduces: `downloadCard()`'s artist-credit guard (blocks download
+if no artist is set and real art is loaded) does not run for batch's
+full-card export. This is intentional — batch already deterministically
+resolves art per row via the `art-flag` (real Scryfall art always
+carries its artist credit from the import; `no-art` rows have no art
+to credit), so the guard's failure mode (accidentally shipping
+uncredited fan art) doesn't apply the same way in an unattended batch
+context.
 
 ### Per-row processing
 
@@ -287,30 +395,56 @@ For each valid row, in order:
 4. **Apply nickname override**: if `row.nickname` is non-blank,
    `card.text.nickname.text = row.nickname; textEdited();`
 
-5. **Export all 3 files**: `downloadCard(); exportFrameAndText();
-   exportTextOnly();` (all three existing, unmodified functions).
+5. **Export all 3 files**, with the collision-safe filename from the
+   Filenames section above:
 
-6. **Delay** exactly 800ms (`await new Promise(r => setTimeout(r, 800));`)
-   before the next row — browsers throttle rapid
-   unattended multi-file downloads (Chrome/Safari may prompt "Allow
-   multiple downloads" after several in quick succession without a
-   fresh user gesture per file). The Batch tab's UI copy tells the
-   user they may need to allow this once, the first time they run a
-   batch on this site.
+   ```js
+   var batchNameBase = getCardName() +
+       (row.setCode ? ' (' + row.setCode.toUpperCase() +
+           (row.collectorNumber ? ' #' + row.collectorNumber.trim() : '') +
+       ')' : '');
+   exportVariant(false, false, '', batchNameBase);
+   exportVariant(true, false, '-frame', batchNameBase);
+   exportVariant(true, true, '-textonly', batchNameBase);
+   ```
+
+6. **Mark the row `'success'`** in `batchRows`, update its Status
+   cell to ✅, update the running summary counts.
+
+7. **Delay** exactly 800ms (`await new Promise(r => setTimeout(r, 800));`),
+   then check `batchCancelled` — if set, stop the loop (see the Stop
+   button, above) rather than continuing to the next row. Otherwise
+   proceed. The 800ms delay itself exists because browsers throttle
+   rapid unattended multi-file downloads (Chrome/Safari may prompt
+   "Allow multiple downloads" after several in quick succession
+   without a fresh user gesture per file) — the Batch tab's UI copy
+   tells the user they may need to allow this once, the first time
+   they run a batch on this site.
 
 ### Error handling
 
-- A row whose Scryfall import fails (404/timeout) is skipped: log a
-  row status of "not found," `notify(...)` once per failure, continue
-  to the next row. Does not stop the batch.
+- A row whose Scryfall import fails (404/timeout, or an
+  unmatched `SetCode`/`CollectorNumber` per step 2) is marked
+  `'error'` with the specific error message as its reason, its Status
+  cell shows ❌ + that reason, `notify(...)` fires once, and the loop
+  continues to the next row. Does not stop the batch.
 - A row whose frame preset fails to apply (caught inside
-  `applyFramePreset`'s own try/catch, which already notifies) —
-  the batch runner also skips exporting that row and continues.
+  `applyFramePreset`'s own try/catch, which already notifies) is
+  likewise marked `'error'` (reason: the caught error's message);
+  the batch runner skips exporting that row and continues.
+- Every `'error'` row lands in the end-of-run summary's failure list
+  and gets a "Retry" affordance (see UI section above) — the summary
+  and retry mechanism read the same `status`/reason fields these
+  error paths write, there's no separate error-tracking structure.
 - Rows are processed **strictly sequentially** (`for...of` with
   `await`, not `Promise.all`) — both because `card`/`card.frames`/
   `card.text` are single shared globals (concurrent rows would
   clobber each other's state) and because the polling-based art wait
   in step 3 only makes sense against one in-flight fetch at a time.
+  "Retry" and "Run Remaining" reuse this same sequential per-row
+  function on a subset of `batchRows`, never in parallel with a
+  still-running main batch (both buttons are disabled while
+  `batchCancelled === false` and a run is actively in progress).
 
 ### Known limitation (documented, not solved by this spec)
 
@@ -356,3 +490,22 @@ project, consistent with prior work):
   even enabled, and that a row with only `Cardname` + blank
   `SetCode`/`CollectorNumber` still parses as valid (both fields are
   optional).
+- Batch two different prints of the same card title in one run (e.g.
+  two rows with the same `Cardname`, different `SetCode`s) — confirm
+  the 6 resulting files (3 each) have distinct filenames including
+  each print's set/number, no overwrite in Downloads.
+- Start a 5+ row batch, click "Stop" partway through — confirm the
+  in-flight row finishes normally, the loop stops before starting the
+  next row, and the summary reflects exactly what ran ("N succeeded,
+  M not yet run") rather than claiming the whole batch completed.
+- After a run with at least one `'error'` row, click that row's
+  "Retry" — confirm it re-runs only that row and updates its Status
+  cell + the summary counts without touching the already-succeeded
+  rows.
+- After a Stop, click "Run Remaining" — confirm it only processes
+  rows still `'pending'`/`'error'`, in original order, and skips every
+  row already marked `'success'`.
+- Save the current textarea as a named batch list, clear the
+  textarea, Load it back — confirm the content matches exactly.
+  Reload the page cold, confirm the saved list is still there
+  (persisted in IndexedDB, not just in-memory).
