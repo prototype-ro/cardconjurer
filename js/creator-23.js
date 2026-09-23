@@ -5743,3 +5743,9 @@ loadScript('/js/frames/groupStandard-3.js');
 loadAvailableCards();
 loadAvailableFramePresets();
 initDraggableArt();
+
+// Canvas text is a static bitmap: if a custom @font-face (e.g. the title font)
+// hasn't finished loading yet when drawCard() first runs, glyphs can render as
+// missing-glyph boxes and never self-correct until the next edit triggers a
+// redraw. Force one authoritative redraw once every font is confirmed loaded.
+document.fonts.ready.then(() => drawCard());
