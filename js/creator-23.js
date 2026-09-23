@@ -5486,6 +5486,16 @@ function loadScript(scriptPath) {
 		document.querySelectorAll('head')[0].appendChild(script);
 	}
 }
+function loadScriptAsync(scriptPath) {
+	return new Promise((resolve, reject) => {
+		var script = document.createElement('script');
+		script.setAttribute('type', 'text/javascript');
+		script.onload = () => resolve();
+		script.onerror = () => reject(new Error('Failed to load script: ' + scriptPath));
+		script.setAttribute('src', scriptPath);
+		document.querySelectorAll('head')[0].appendChild(script);
+	});
+}
 // Stretchable SVGs
 function stretchSVG(frameObject) {
 	xhr = new XMLHttpRequest();
