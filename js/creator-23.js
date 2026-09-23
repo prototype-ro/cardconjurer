@@ -48,6 +48,8 @@ function getStandardHeight() {
 
 //card object
 var card = {width:getStandardWidth(), height:getStandardHeight(), marginX:0, marginY:0, frames:[], artSource:fixUri('/img/blank.png'), artX:0, artY:0, artZoom:1, artRotate:0, setSymbolSource:fixUri('/img/blank.png'), setSymbolX:0, setSymbolY:0, setSymbolZoom:1, watermarkSource:fixUri('/img/blank.png'), watermarkX:0, watermarkY:0, watermarkZoom:1, watermarkLeft:'none', watermarkRight:'none', watermarkOpacity:0.4, version:'', manaSymbols:[]};
+var lastLoadedFrameGroup = null;
+var lastLoadedFramePack = null;
 //core images/masks
 const black = new Image(); black.crossOrigin = 'anonymous'; black.src = fixUri('/img/black.png');
 const blank = new Image(); blank.crossOrigin = 'anonymous'; blank.src = fixUri('/img/blank.png');
@@ -3119,8 +3121,8 @@ async function saveFramePreset() {
 			frame.masks.forEach(mask => delete mask.image);
 		});
 		var presetToSave = {
-			frameGroup: document.querySelector('#selectFrameGroup').value,
-			framePack: document.querySelector('#selectFramePack').value,
+			frameGroup: lastLoadedFrameGroup,
+			framePack: lastLoadedFramePack,
 			frames: framesToSave,
 			textStyles: captureTextStyles()
 		};
@@ -5752,6 +5754,11 @@ bindInputs('#frame-editor-hsl-hue', '#frame-editor-hsl-hue-slider');
 bindInputs('#frame-editor-hsl-saturation', '#frame-editor-hsl-saturation-slider');
 bindInputs('#frame-editor-hsl-lightness', '#frame-editor-hsl-lightness-slider');
 bindInputs('#show-guidelines', '#show-guidelines-2', true);
+
+document.querySelector('#loadFrameVersion').addEventListener('click', () => {
+	lastLoadedFrameGroup = document.querySelector('#selectFrameGroup').value;
+	lastLoadedFramePack = document.querySelector('#selectFramePack').value;
+});
 
 // Load / init whatever
 loadScript('/js/frames/groupStandard-3.js');
