@@ -4997,6 +4997,77 @@ function changeCardIndex() {
 		fetchSetSymbol();
 	}
 }
+//Card storage backend (IndexedDB instead of localStorage, since localStorage is capped at ~5MB per origin by the browser while IndexedDB is limited only by available disk space)
+const cardDB = {
+	db: null,
+	open() {
+		if (this.db) {return Promise.resolve(this.db);}
+		return new Promise((resolve, reject) => {
+			var request = indexedDB.open('CardConjurerDB', 1);
+			request.onupgradeneeded = event => {
+				if (!event.target.result.objectStoreNames.contains('cards')) {
+					event.target.result.createObjectStore('cards');
+				}
+			};
+			request.onsuccess = event => {
+				this.db = event.target.result;
+				resolve(this.db);
+			};
+			request.onerror = event => reject(event.target.error);
+		});
+	},
+	async set(key, value) {
+		var db = await this.open();
+		return new Promise((resolve, reject) => {
+			var tx = db.transaction('cards', 'readwrite');
+			tx.objectStore('cards').put(value, key);
+			tx.oncomplete = () => resolve();
+			tx.onerror = event => reject(event.target.error);
+		});
+	},
+	async get(key) {
+		var db = await this.open();
+		return new Promise((resolve, reject) => {
+			var request = db.transaction('cards', 'readonly').objectStore('cards').get(key);
+			request.onsuccess = () => resolve(request.result);
+			request.onerror = event => reject(event.target.error);
+		});
+	},
+	async delete(key) {
+		var db = await this.open();
+		return new Promise((resolve, reject) => {
+			var tx = db.transaction('cards', 'readwrite');
+			tx.objectStore('cards').delete(key);
+			tx.oncomplete = () => resolve();
+			tx.onerror = event => reject(event.target.error);
+		});
+	},
+	async clear() {
+		var db = await this.open();
+		return new Promise((resolve, reject) => {
+			var tx = db.transaction('cards', 'readwrite');
+			tx.objectStore('cards').clear();
+			tx.oncomplete = () => resolve();
+			tx.onerror = event => reject(event.target.error);
+		});
+	}
+};
+//One-time migration of cards saved under the old localStorage scheme into IndexedDB, freeing up localStorage space
+async function migrateCardsToIndexedDB() {
+	var cardKeys = JSON.parse(localStorage.getItem('cardKeys')) || [];
+	for (const key of cardKeys) {
+		var raw = localStorage.getItem(key);
+		if (raw !== null) {
+			try {
+				await cardDB.set(key, JSON.parse(raw));
+				localStorage.removeItem(key);
+			} catch (error) {
+				console.error('Failed to migrate saved card "' + key + '" to IndexedDB:', error);
+			}
+		}
+	}
+}
+migrateCardsToIndexedDB();
 function loadAvailableCards(cardKeys = JSON.parse(localStorage.getItem('cardKeys'))) {
 	if (!cardKeys) {
 		cardKeys = [];
@@ -5014,7 +5085,7 @@ function importChanged() {
 	var unique = document.querySelector('#importAllPrints').checked ? 'prints' : '';
 	fetchScryfallData(document.querySelector("#import-name").value, importCard, unique);
 }
-function saveCard(saveFromFile) {
+async function saveCard(saveFromFile) {
 	var cardKeys = JSON.parse(localStorage.getItem('cardKeys')) || [];
 	var cardKey, cardToSave;
 	if (saveFromFile) {
@@ -5047,7 +5118,7 @@ function saveCard(saveFromFile) {
 		});
 	}
 	try {
-		localStorage.setItem(cardKey, JSON.stringify(cardToSave));
+		await cardDB.set(cardKey, cardToSave);
 		if (!cardKeys.includes(cardKey)) {
 			cardKeys.push(cardKey);
 			cardKeys.sort();
@@ -5055,7 +5126,7 @@ function saveCard(saveFromFile) {
 			loadAvailableCards(cardKeys);
 		}
 	} catch (error) {
-		notify('You have exceeded your 5MB of local storage, and your card has failed to save. If you would like to continue saving cards, please download all saved cards, then delete all saved cards to free up space.<br><br>Local storage is most often exceeded by uploading large images directly from your computer. If possible/convenient, using a URL avoids the need to save these large images.<br><br>Apologies for the inconvenience.');
+		notify('Your card failed to save (' + error.message + '). This usually means your device has run out of disk space.<br><br>Apologies for the inconvenience.');
 	}
 }
 async function loadCard(selectedCardKey) {
@@ -5063,7 +5134,7 @@ async function loadCard(selectedCardKey) {
 	document.querySelector('#frame-list').innerHTML = null;
 	//clear the existing card, then replace it with the new JSON
 	card = {};
-	card = JSON.parse(localStorage.getItem(selectedCardKey));
+	card = await cardDB.get(selectedCardKey);
 	//if the card was loaded properly...
 	if (card) {
 		//load values from card into html inputs
@@ -5126,22 +5197,21 @@ async function loadCard(selectedCardKey) {
 		notify(selectedCardKey + ' failed to load.', 5)
 	}
 }
-function deleteCard() {
+async function deleteCard() {
 	var keyToDelete = document.querySelector('#load-card-options').value;
 	if (keyToDelete) {
 		var cardKeys = JSON.parse(localStorage.getItem('cardKeys'));
 		cardKeys.splice(cardKeys.indexOf(keyToDelete), 1);
 		cardKeys.sort();
 		localStorage.setItem('cardKeys', JSON.stringify(cardKeys));
-		localStorage.removeItem(keyToDelete);
+		await cardDB.delete(keyToDelete);
 		loadAvailableCards(cardKeys);
 	}
 }
-function deleteSavedCards() {
+async function deleteSavedCards() {
 	if (confirm('WARNING:\n\nALL of your saved cards will be deleted! If you would like to save these cards, please make sure you have downloaded them first. There is no way to undo this.\n\n(Press "OK" to delete your cards)')) {
-		var cardKeys = JSON.parse(localStorage.getItem('cardKeys'));
-		cardKeys.forEach(key => localStorage.removeItem(key));
 		localStorage.setItem('cardKeys', JSON.stringify([]));
+		await cardDB.clear();
 		loadAvailableCards([]);
 	}
 }
@@ -5149,9 +5219,9 @@ async function downloadSavedCards() {
 	var cardKeys = JSON.parse(localStorage.getItem('cardKeys'));
 	if (cardKeys) {
 		var allSavedCards = [];
-		cardKeys.forEach(item => {
-			allSavedCards.push({key:item, data:JSON.parse(localStorage.getItem(item))});
-		});
+		for (const item of cardKeys) {
+			allSavedCards.push({key:item, data:await cardDB.get(item)});
+		}
 		var download = document.createElement('a');
 		download.href = URL.createObjectURL(new Blob([JSON.stringify(allSavedCards)], {type:'text'}));
 		download.download = 'saved-cards.cardconjurer';
