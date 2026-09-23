@@ -4792,6 +4792,25 @@ function downloadCard(alt = false, jpeg = false) {
 		}
 	}
 }
+function exportVariant(skipArt, skipFrame, suffix) {
+	drawCard(skipArt, skipFrame);
+	var imageDataURL = cardCanvas.toDataURL('image/png');
+	var imageName = getCardName() + suffix + '.png';
+	const downloadElement = document.createElement('a');
+	downloadElement.download = imageName;
+	downloadElement.target = '_blank';
+	downloadElement.href = imageDataURL;
+	document.body.appendChild(downloadElement);
+	downloadElement.click();
+	downloadElement.remove();
+	drawCard();
+}
+function exportFrameAndText() {
+	exportVariant(true, false, '-frame');
+}
+function exportTextOnly() {
+	exportVariant(true, true, '-textonly');
+}
 //IMPORT/SAVE TAB
 function importCard(cardObject) {
 	scryfallCard = cardObject;
