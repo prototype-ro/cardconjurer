@@ -3101,27 +3101,27 @@ async function saveFramePreset() {
 	if (!presetName) {return null;}
 	presetName = presetName.trim();
 	if (!presetName) {return null;}
-	var existingKeys = await cardDB.keys('framePresets');
-	if (existingKeys.includes(presetName)) {
-		if (!confirm('Would you like to overwrite the frame preset "' + presetName + '"?\n(Clicking "cancel" will affix a version number)')) {
-			var originalPresetName = presetName;
-			var presetNumber = 1;
-			while (existingKeys.includes(presetName)) {
-				presetName = originalPresetName + ' (' + presetNumber + ')';
-				presetNumber++;
+	try {
+		var existingKeys = await cardDB.keys('framePresets');
+		if (existingKeys.includes(presetName)) {
+			if (!confirm('Would you like to overwrite the frame preset "' + presetName + '"?\n(Clicking "cancel" will affix a version number)')) {
+				var originalPresetName = presetName;
+				var presetNumber = 1;
+				while (existingKeys.includes(presetName)) {
+					presetName = originalPresetName + ' (' + presetNumber + ')';
+					presetNumber++;
+				}
 			}
 		}
-	}
-	var framesToSave = JSON.parse(JSON.stringify(card.frames));
-	framesToSave.forEach(frame => {
-		delete frame.image;
-		frame.masks.forEach(mask => delete mask.image);
-	});
-	var presetToSave = {
-		frames: framesToSave,
-		textStyles: captureTextStyles()
-	};
-	try {
+		var framesToSave = JSON.parse(JSON.stringify(card.frames));
+		framesToSave.forEach(frame => {
+			delete frame.image;
+			frame.masks.forEach(mask => delete mask.image);
+		});
+		var presetToSave = {
+			frames: framesToSave,
+			textStyles: captureTextStyles()
+		};
 		await cardDB.set(presetName, presetToSave, 'framePresets');
 		loadAvailableFramePresets();
 	} catch (error) {
@@ -3129,15 +3129,19 @@ async function saveFramePreset() {
 	}
 }
 async function loadAvailableFramePresets() {
-	var presetKeys = await cardDB.keys('framePresets');
-	var select = document.querySelector('#load-frame-preset-options');
-	select.innerHTML = '<option selected="selected" disabled>None selected</option>';
-	presetKeys.sort().forEach(item => {
-		var presetOption = document.createElement('option');
-		presetOption.innerHTML = item;
-		presetOption.value = item;
-		select.appendChild(presetOption);
-	});
+	try {
+		var presetKeys = await cardDB.keys('framePresets');
+		var select = document.querySelector('#load-frame-preset-options');
+		select.innerHTML = '<option selected="selected" disabled>None selected</option>';
+		presetKeys.sort().forEach(item => {
+			var presetOption = document.createElement('option');
+			presetOption.innerHTML = item;
+			presetOption.value = item;
+			select.appendChild(presetOption);
+		});
+	} catch (error) {
+		notify('Failed to load frame presets (' + error.message + ').');
+	}
 }
 function removeFrame(event) {
 	card.frames.splice(getElementIndex(event.target.parentElement), 1);
