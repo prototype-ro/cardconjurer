@@ -3119,6 +3119,8 @@ async function saveFramePreset() {
 			frame.masks.forEach(mask => delete mask.image);
 		});
 		var presetToSave = {
+			frameGroup: document.querySelector('#selectFrameGroup').value,
+			framePack: document.querySelector('#selectFramePack').value,
 			frames: framesToSave,
 			textStyles: captureTextStyles()
 		};
