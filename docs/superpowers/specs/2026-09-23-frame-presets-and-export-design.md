@@ -12,23 +12,50 @@ Not in scope: batch/unattended generation over a list of card data.
 This spec covers manual, per-card use of both features. A batch
 runner is a candidate follow-up spec.
 
-## 1. Frame presets
+## 1. Frame presets (frame stack + linked text styling)
 
 ### What's saved
 
-Just the frame stack: the current value of `card.frames` (the ordered
-list of frame/mask image entries drawn by `drawFrames()` at
-[js/creator-23.js:386](../../../js/creator-23.js#L386)). Nothing else
-on the card (text, art, set symbol, watermark, collector info) is
-touched by save or apply.
+One combined preset, saved and applied as a single unit:
+
+1. **Frame stack** — the current value of `card.frames` (the ordered
+   list of frame/mask image entries drawn by `drawFrames()` at
+   [js/creator-23.js:386](../../../js/creator-23.js#L386)).
+2. **Text styling** — for every key currently in `card.text` (each
+   textbox: title, rules text, P/T, mana cost, etc. — see
+   `loadTextOptions` at
+   [js/creator-23.js:3286](../../../js/creator-23.js#L3286)), the
+   *style* fields only, captured per textbox name so title keeps its
+   own style, rules text keeps its own, etc.:
+   `color`, `font`, `fontStyle`, `shadow`, `shadowX`, `shadowY`,
+   `shadowBlur`, `outlineColor`, `outlineWidth`, `kerning`,
+   `lineSpacing`, `align`, `justify`.
+
+Explicitly **not** captured, on either the frame or text side: text
+*content* (`text`), textbox position/size (`x`, `y`, `width`,
+`height`), art, set symbol, watermark, collector info. Save/apply only
+ever touches frame stack + the listed style fields on textboxes that
+already exist on the card at apply time.
 
 ### Storage
 
 New IndexedDB object store `framePresets` in the existing
 `CardConjurerDB` (same database the `cardDB` helper already opens for
 saved cards, see `js/creator-23.js` around line 5000). Key = preset
-name (string), value = the `card.frames` array at save time
-(structured-clone-safe, same as saved cards already are).
+name (string). Value = one object:
+
+```js
+{
+  frames: [...],       // deep copy of card.frames, image refs stripped
+  textStyles: {         // keyed by textbox name, e.g. "title", "rules", "pt"
+    title: { color, font, fontStyle, shadow, shadowX, shadowY,
+              shadowBlur, outlineColor, outlineWidth, kerning,
+              lineSpacing, align, justify },
+    rules: { ... },
+    ...
+  }
+}
+```
 
 ### UI
 
@@ -37,16 +64,25 @@ New sub-section in the Frame tab (`#creator-menu-frame` in
 existing "frame-list" reorder section:
 
 - Text input + "Save Frame Preset" button. On click: read the frame
-  list order live from `card.frames` (not from any separate draft
-  state) and write it to `framePresets` under the typed name.
-  Empty/duplicate name handling follows the same pattern already used
-  for card names in `saveCard()`.
+  list order live from `card.frames`, and the style fields from every
+  entry currently in `card.text`, and write both into a single
+  `framePresets` record under the typed name. Empty/duplicate name
+  handling follows the same pattern already used for card names in
+  `saveCard()`.
 - `<select>` populated from `framePresets` keys (list refreshed after
   save/delete, same pattern as `loadAvailableCards()`).
-- "Apply" button: clear `#frame-list` and `card.frames`, set
-  `card.frames` to a deep copy of the stored preset, rebuild the
-  frame-list DOM the same way `addFrame()` does for each entry, then
-  call `drawFrames()` to redraw.
+- "Apply" button:
+  - Frame side: clear `#frame-list` and `card.frames`, set
+    `card.frames` to a deep copy of the stored preset's `frames`,
+    rebuild the frame-list DOM the same way `addFrame()` does for each
+    entry, then call `drawFrames()` to redraw.
+  - Text side: for each key in the stored preset's `textStyles` that
+    also exists in the *current* `card.text` (a preset saved against
+    one frame layout may name textboxes a differently-loaded frame
+    doesn't have — those are skipped, not errored), merge the saved
+    style fields onto `card.text[key]` (overwriting only those fields,
+    leaving `text`/`x`/`y`/`width`/`height` untouched), then call
+    `drawTextBuffer()` to redraw.
 - "Delete" button: removes the selected key from `framePresets`,
   refreshes the list.
 
@@ -54,7 +90,10 @@ existing "frame-list" reorder section:
 
 Same shape as existing card storage errors: wrap IndexedDB calls in
 try/catch, `notify()` on failure. No new failure modes introduced
-beyond what `cardDB` already handles.
+beyond what `cardDB` already handles. A `textStyles` entry naming a
+textbox absent from the current card is silently skipped (not an
+error) — the preset is meant to be reusable across cards whose frame
+version may expose a different set of textboxes.
 
 ## 2. Export section
 
@@ -120,8 +159,13 @@ no art to credit.
 Manual verification in the running app (this project has no
 automated test suite):
 
-- Save a frame preset, change frames, Apply preset, confirm frame
-  stack matches what was saved and nothing else on the card changed.
+- Save a frame preset with distinct text styling on two textboxes
+  (e.g. different shadow colors), change frames and text styles,
+  Apply preset, confirm frame stack AND per-textbox styling both
+  match what was saved, text content/position untouched.
+- Apply a frame preset saved on one card to a card whose `card.text`
+  is missing one of the saved textbox names — confirm it applies the
+  frame + the styles that do match, and does not error on the rest.
 - Delete a preset, confirm it's gone from the dropdown and from a
   fresh page load (IndexedDB persisted).
 - Export all three files on a card with art, frame, text, set symbol,

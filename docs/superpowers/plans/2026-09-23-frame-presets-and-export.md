@@ -2,9 +2,9 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
-**Goal:** Let a user save the current frame stack as a named preset and reapply it later, and export a card as three PNGs (full card, frame+text+symbol without art, text+symbol only without frame or art) instead of one.
+**Goal:** Let a user save the current frame stack, plus the per-textbox text styling (color, font, shadow, outline, kerning, spacing, alignment) linked to it, as one named preset and reapply both together later. Also let a card be exported as three PNGs (full card, frame+text+symbol without art, text+symbol only without frame or art) instead of one.
 
-**Architecture:** Extend the existing `CardConjurerDB` IndexedDB database (currently used only for saved cards) with a second object store, `framePresets`, reusing the same connection. Add preset save/apply/delete UI to the Frame tab, mirroring the existing saved-card UI pattern in the Import/Save tab. Add optional `skipArt`/`skipFrame` flags to the existing `drawCard()` function (default `false`, so all existing call sites are unaffected), and a new Export tab with three buttons that render each variant to the card canvas, download it, then restore the normal on-screen preview.
+**Architecture:** Extend the existing `CardConjurerDB` IndexedDB database (currently used only for saved cards) with a second object store, `framePresets`, reusing the same connection. Each preset record holds both `frames` (the frame stack) and `textStyles` (per-textbox-name style fields), saved and applied as one unit. Add preset save/apply/delete UI to the Frame tab, mirroring the existing saved-card UI pattern in the Import/Save tab. Add optional `skipArt`/`skipFrame` flags to the existing `drawCard()` function (default `false`, so all existing call sites are unaffected), and a new Export tab with three buttons that render each variant to the card canvas, download it, then restore the normal on-screen preview.
 
 **Tech Stack:** Vanilla JS (ES2017+, async/await), IndexedDB, static HTML/CSS. No build step, no test framework — this project has none; verification is manual via the running local server and browser devtools, per the design spec's Testing section.
 
@@ -186,15 +186,38 @@ git commit -m "Add framePresets IndexedDB store, generalize cardDB helper"
 
 ---
 
-### Task 2: Save Frame Preset
+### Task 2: Save Frame Preset (frame stack + linked text styling)
 
 **Files:**
-- Modify: `js/creator-23.js` (add new function near the frame-handling functions, e.g. directly after `addFrame` ends, around line 3100 — exact insertion point found by locating the end of `addFrame`)
+- Modify: `js/creator-23.js` (add new functions near the frame-handling functions, e.g. directly after `addFrame` ends, around line 3100 — exact insertion point found by locating the end of `addFrame`)
 - Modify: `creator/index.html:172` (insert new UI block after the frame-list section)
 
-- [ ] **Step 1: Add `saveFramePreset()`**
+The text style fields being captured per textbox: `color`, `font`, `fontStyle`, `shadow`, `shadowX`, `shadowY`, `shadowBlur`, `outlineColor`, `outlineWidth`, `kerning`, `lineSpacing`, `align`, `justify`. These are documented on `card.text[key]` entries — see `writeText`'s use of them starting at `js/creator-23.js:3478` (`var textColor = textObject.color`, etc.). Not captured: `text` (content), `x`, `y`, `width`, `height`, `name`, `fontSize` (fontSize is a per-edit override the user sets via the font-size input, not part of the frame's styling identity).
 
-Add this function in `js/creator-23.js`. Place it right after the closing brace of `addFrame` (search for `async function addFrame(additionalMasks = [], loadingFrame = false) {` at line 2993 and find its matching closing `}` — insert immediately after):
+- [ ] **Step 1: Add `captureTextStyles()` helper**
+
+Add this function in `js/creator-23.js`, right after the closing brace of `addFrame` (search for `async function addFrame(additionalMasks = [], loadingFrame = false) {` at line 2993 and find its matching closing `}` — insert immediately after):
+
+```js
+const TEXT_STYLE_FIELDS = ['color', 'font', 'fontStyle', 'shadow', 'shadowX', 'shadowY', 'shadowBlur', 'outlineColor', 'outlineWidth', 'kerning', 'lineSpacing', 'align', 'justify'];
+function captureTextStyles() {
+	var textStyles = {};
+	Object.entries(card.text || {}).forEach(([key, textObject]) => {
+		var style = {};
+		TEXT_STYLE_FIELDS.forEach(field => {
+			if (textObject[field] !== undefined) {
+				style[field] = textObject[field];
+			}
+		});
+		textStyles[key] = style;
+	});
+	return textStyles;
+}
+```
+
+- [ ] **Step 2: Add `saveFramePreset()`**
+
+Add directly after `captureTextStyles`:
 
 ```js
 async function saveFramePreset() {
@@ -218,8 +241,12 @@ async function saveFramePreset() {
 		delete frame.image;
 		frame.masks.forEach(mask => delete mask.image);
 	});
+	var presetToSave = {
+		frames: framesToSave,
+		textStyles: captureTextStyles()
+	};
 	try {
-		await cardDB.set(presetName, framesToSave, 'framePresets');
+		await cardDB.set(presetName, presetToSave, 'framePresets');
 		loadAvailableFramePresets();
 	} catch (error) {
 		notify('Your frame preset failed to save (' + error.message + ').');
@@ -227,9 +254,9 @@ async function saveFramePreset() {
 }
 ```
 
-This mirrors `saveCard()` at `js/creator-23.js:5088` exactly: same prompt/overwrite/versioning flow, same `delete frame.image` / `delete mask.image` stripping before storage (Image objects aren't meaningfully serializable and get rebuilt from `src` on load — see `addFrame`'s handling of `loadingFrame`).
+This mirrors `saveCard()` at `js/creator-23.js:5088`: same prompt/overwrite/versioning flow, same `delete frame.image` / `delete mask.image` stripping before storage (Image objects aren't meaningfully serializable and get rebuilt from `src` on load — see `addFrame`'s handling of `loadingFrame`). The stored record now bundles `frames` and `textStyles` together, so one save captures both.
 
-- [ ] **Step 2: Add `loadAvailableFramePresets()`**
+- [ ] **Step 3: Add `loadAvailableFramePresets()`**
 
 Add directly after `saveFramePreset`:
 
@@ -249,15 +276,15 @@ async function loadAvailableFramePresets() {
 
 This mirrors `loadAvailableCards()` at `js/creator-23.js:5071`.
 
-- [ ] **Step 3: Add the UI block**
+- [ ] **Step 4: Add the UI block**
 
 In `creator/index.html`, insert after line 172 (the closing `</div>` of the "Drag to reorder frame images" block that contains `#frame-list`, right before the "Upload custom frame images" block):
 
 ```html
 						<div class='readable-background padding margin-bottom'>
-							<h5 class='padding margin-bottom input-description'>Save the current frame stack as a preset</h5>
+							<h5 class='padding margin-bottom input-description'>Save the current frame stack and text styling (color, font, shadow, outline, spacing) as a preset</h5>
 							<button class='input margin-bottom' onclick='saveFramePreset();'>Save Frame Preset</button>
-							<h5 class='padding margin-bottom input-description'>Apply a saved frame preset</h5>
+							<h5 class='padding margin-bottom input-description'>Apply a saved frame preset (frame stack + text styling)</h5>
 							<select id='load-frame-preset-options' class='input margin-bottom' onchange='applyFramePreset(this.value);'></select>
 							<h5 class='padding margin-bottom input-description'>Delete selected frame preset</h5>
 							<button class='input' onclick='deleteFramePreset();'>Delete Frame Preset</button>
@@ -266,7 +293,7 @@ In `creator/index.html`, insert after line 172 (the closing `</div>` of the "Dra
 
 (`applyFramePreset` is implemented in Task 3 — this button is wired now but has no handler yet, which is fine since it isn't called until Task 3 lands in the same session before manual testing.)
 
-- [ ] **Step 4: Call `loadAvailableFramePresets()` on page init**
+- [ ] **Step 5: Call `loadAvailableFramePresets()` on page init**
 
 In `js/creator-23.js`, find the init block near the end of the file:
 
@@ -287,18 +314,18 @@ loadAvailableFramePresets();
 initDraggableArt();
 ```
 
-- [ ] **Step 5: Manual verification**
+- [ ] **Step 6: Manual verification**
 
-Reload the page. Go to the Frame tab, add a couple of frames to the card (any frame from the picker), click "Save Frame Preset", enter a test name like `test-preset-1`. Confirm:
+Reload the page. Go to the Frame tab, add a couple of frames to the card (any frame from the picker), type some text into a textbox and give it a distinct color/shadow, click "Save Frame Preset", enter a test name like `test-preset-1`. Confirm:
 - No console errors.
-- In devtools Application > IndexedDB > CardConjurerDB > framePresets, a record with key `test-preset-1` exists, value is an array of frame objects with no `image` property.
+- In devtools Application > IndexedDB > CardConjurerDB > framePresets, a record with key `test-preset-1` exists, value is `{frames: [...], textStyles: {...}}` — `frames` entries have no `image` property, `textStyles` has an entry per current textbox name with only the style fields (no `text`, `x`, `y`, `width`, `height`).
 - The "Apply a saved frame preset" dropdown now lists `test-preset-1`.
 
-- [ ] **Step 6: Commit**
+- [ ] **Step 7: Commit**
 
 ```bash
 git add js/creator-23.js creator/index.html
-git commit -m "Add Save Frame Preset UI and storage"
+git commit -m "Add Save Frame Preset UI and storage (frames + text styles)"
 ```
 
 ---
@@ -315,37 +342,49 @@ Add directly after `loadAvailableFramePresets` (from Task 2):
 ```js
 async function applyFramePreset(presetName) {
 	if (!presetName) {return;}
-	var frames = await cardDB.get(presetName, 'framePresets');
-	if (!frames) {
+	var preset = await cardDB.get(presetName, 'framePresets');
+	if (!preset) {
 		notify(presetName + ' failed to load.', 5);
 		return;
 	}
+	// frame stack
 	document.querySelector('#frame-list').innerHTML = null;
-	card.frames = JSON.parse(JSON.stringify(frames));
+	card.frames = JSON.parse(JSON.stringify(preset.frames));
 	card.frames.reverse();
 	await card.frames.forEach(item => addFrame([], item));
 	card.frames.reverse();
+	// linked text styling
+	Object.entries(preset.textStyles || {}).forEach(([key, style]) => {
+		if (card.text[key]) {
+			Object.assign(card.text[key], style);
+		}
+	});
+	drawTextBuffer();
 }
 ```
 
-This mirrors the frame-loading portion of `loadCard()` at `js/creator-23.js:5170-5173` exactly: clear `#frame-list`, set `card.frames`, reverse/add/reverse (because `addFrame(additionalMasks, loadingFrame)` prepends each DOM element, so building in reverse order yields the correct final on-screen order), where `addFrame([], item)` with `item` truthy takes the `loadingFrame` branch and does not re-push onto `card.frames` (already set above), only rebuilds the DOM element and reloads each frame/mask image.
+The frame-stack portion mirrors the frame-loading part of `loadCard()` at `js/creator-23.js:5170-5173` exactly: clear `#frame-list`, set `card.frames`, reverse/add/reverse (because `addFrame(additionalMasks, loadingFrame)` prepends each DOM element, so building in reverse order yields the correct final on-screen order), where `addFrame([], item)` with `item` truthy takes the `loadingFrame` branch and does not re-push onto `card.frames` (already set above), only rebuilds the DOM element and reloads each frame/mask image.
+
+The text-styling portion only touches `card.text[key]` entries that already exist on the current card (`if (card.text[key])` guard — a preset saved against a different frame layout may name textboxes this card doesn't have; those are silently skipped, not an error). `Object.assign` merges just the saved style fields onto the existing textbox object, leaving `text`, `x`, `y`, `width`, `height` untouched. `drawTextBuffer()` (the existing debounced redraw used by `textEdited()` at `js/creator-23.js:3333`) picks up the change.
 
 - [ ] **Step 2: Manual verification**
 
 Reload the page. In the Frame tab:
-1. Add frame A to the card, save it as preset `preset-a`.
-2. Clear the card's frames (remove them from `#frame-list`, or just add a different frame B without saving).
+1. Add frame A to the card, type text into two different textboxes and give each a distinct color/shadow, save it as preset `preset-a`.
+2. Clear the card's frames (remove them from `#frame-list`, or just add a different frame B without saving), and change the text colors/shadows to something else.
 3. Select `preset-a` from the "Apply a saved frame preset" dropdown.
 
-Expected: the frame list on screen updates to show only frame A again, the card preview redraws with frame A, and nothing else about the card (any text you'd typed, art, etc.) changed.
+Expected: the frame list on screen updates to show only frame A again, the card preview redraws with frame A, both textboxes' colors/shadows revert to what was saved, and the text *content* you typed is untouched (still shows whatever you'd typed before applying, not what was in the textbox at save time).
 
 Also verify order preservation: save a preset with two different frames stacked in a specific order, change the order, apply the preset again, confirm the original order is restored.
+
+Also verify the missing-textbox case: apply a preset saved on a card with textbox `pt` to a card/frame that has no `pt` textbox in `card.text` — confirm no console error, and every other textbox's style still applies correctly.
 
 - [ ] **Step 3: Commit**
 
 ```bash
 git add js/creator-23.js
-git commit -m "Add Apply Frame Preset"
+git commit -m "Add Apply Frame Preset (frame stack + text styling)"
 ```
 
 ---
@@ -773,8 +812,9 @@ git commit -m "Add Export tab: frame+text+symbol and text+symbol-only PNG export
 
 With the local server running, in the browser:
 
-1. Save a frame preset, change frames, Apply preset — confirm frame stack matches what was saved and nothing else on the card changed.
-2. Delete a preset, confirm it's gone from the dropdown and from a fresh page reload.
+1. Save a frame preset with distinct per-textbox styling, change frames and styling, Apply preset — confirm frame stack AND text styling both match what was saved, text content/position untouched.
+2. Apply a frame preset to a card missing one of its saved textbox names — confirm it applies without error.
+3. Delete a preset, confirm it's gone from the dropdown and from a fresh page reload.
 3. On a card with art, frame, text, set symbol, watermark, and collector info all populated, export all three files and confirm:
    - Full Card matches current export behavior exactly.
    - File 2 has no art, everything else present.
