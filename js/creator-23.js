@@ -3143,6 +3143,31 @@ async function loadAvailableFramePresets() {
 		notify('Failed to load frame presets (' + error.message + ').');
 	}
 }
+async function applyFramePreset(presetName) {
+	if (!presetName) {return;}
+	try {
+		var preset = await cardDB.get(presetName, 'framePresets');
+		if (!preset) {
+			notify(presetName + ' failed to load.', 5);
+			return;
+		}
+		// frame stack
+		document.querySelector('#frame-list').innerHTML = null;
+		card.frames = JSON.parse(JSON.stringify(preset.frames));
+		card.frames.reverse();
+		await card.frames.forEach(item => addFrame([], item));
+		card.frames.reverse();
+		// linked text styling
+		Object.entries(preset.textStyles || {}).forEach(([key, style]) => {
+			if (card.text[key]) {
+				Object.assign(card.text[key], style);
+			}
+		});
+		drawTextBuffer();
+	} catch (error) {
+		notify('Failed to apply frame preset "' + presetName + '" (' + error.message + ').');
+	}
+}
 function removeFrame(event) {
 	card.frames.splice(getElementIndex(event.target.parentElement), 1);
 	event.target.parentElement.remove();
