@@ -4641,31 +4641,35 @@ function setDefaultCollector() {
 	localStorage.setItem('defaultCollector', JSON.stringify(defaultCollector));
 }
 //DRAWING THE CARD (putting it all together)
-function drawCard() {
+function drawCard(skipArt = false, skipFrame = false) {
 	// reset
 	cardContext.globalCompositeOperation = 'source-over';
 	cardContext.clearRect(0, 0, cardCanvas.width, cardCanvas.height);
 	// art
-	cardContext.save();
-	cardContext.translate(scaleX(card.artX), scaleY(card.artY));
-	cardContext.rotate(Math.PI / 180 * (card.artRotate || 0));
-	if (document.querySelector('#grayscale-art').checked) {
-		cardContext.filter='grayscale(1)';
+	if (!skipArt) {
+		cardContext.save();
+		cardContext.translate(scaleX(card.artX), scaleY(card.artY));
+		cardContext.rotate(Math.PI / 180 * (card.artRotate || 0));
+		if (document.querySelector('#grayscale-art').checked) {
+			cardContext.filter='grayscale(1)';
+		}
+		cardContext.drawImage(art, 0, 0, art.width * card.artZoom, art.height * card.artZoom);
+		cardContext.restore();
 	}
-	cardContext.drawImage(art, 0, 0, art.width * card.artZoom, art.height * card.artZoom);
-	cardContext.restore();
 	// frame elements
-	if (card.version.includes('planeswalker') && typeof planeswalkerPreFrameCanvas !== "undefined") {
-		cardContext.drawImage(planeswalkerPreFrameCanvas, 0, 0, cardCanvas.width, cardCanvas.height);
+	if (!skipFrame) {
+		if (card.version.includes('planeswalker') && typeof planeswalkerPreFrameCanvas !== "undefined") {
+			cardContext.drawImage(planeswalkerPreFrameCanvas, 0, 0, cardCanvas.width, cardCanvas.height);
+		}
+		cardContext.drawImage(frameCanvas, 0, 0, cardCanvas.width, cardCanvas.height);
+		if (card.version.toLowerCase().includes('planeswalker') && typeof planeswalkerPostFrameCanvas !== "undefined") {
+			cardContext.drawImage(planeswalkerPostFrameCanvas, 0, 0, cardCanvas.width, cardCanvas.height);
+		} else if (card.version.toLowerCase().includes('planeswalker') && typeof planeswalkerCanvas !== "undefined") {
+			cardContext.drawImage(planeswalkerCanvas, 0, 0, cardCanvas.width, cardCanvas.height);
+		} else if (card.version.toLowerCase().includes('qrcode') && typeof qrCodeCanvas !== "undefined") {
+			cardContext.drawImage(qrCodeCanvas, 0, 0, cardCanvas.width, cardCanvas.height);
+		} // REMOVE/DELETE PLANESWALKERCANVAS AFTER A FEW WEEKS
 	}
-	cardContext.drawImage(frameCanvas, 0, 0, cardCanvas.width, cardCanvas.height);
-	if (card.version.toLowerCase().includes('planeswalker') && typeof planeswalkerPostFrameCanvas !== "undefined") {
-		cardContext.drawImage(planeswalkerPostFrameCanvas, 0, 0, cardCanvas.width, cardCanvas.height);
-	} else if (card.version.toLowerCase().includes('planeswalker') && typeof planeswalkerCanvas !== "undefined") {
-		cardContext.drawImage(planeswalkerCanvas, 0, 0, cardCanvas.width, cardCanvas.height);
-	} else if (card.version.toLowerCase().includes('qrcode') && typeof qrCodeCanvas !== "undefined") {
-		cardContext.drawImage(qrCodeCanvas, 0, 0, cardCanvas.width, cardCanvas.height);
-	} // REMOVE/DELETE PLANESWALKERCANVAS AFTER A FEW WEEKS
 	// guidelines
 	if (document.querySelector('#show-guidelines').checked) {
 		cardContext.drawImage(guidelinesCanvas, scaleX(card.marginX) / 2, scaleY(card.marginY) / 2, cardCanvas.width, cardCanvas.height);
@@ -4737,7 +4741,7 @@ function drawCard() {
 	
 	// cutout the corners
 	cardContext.globalCompositeOperation = 'destination-out';
-	if (!card.noCorners && (card.marginX == 0 && card.marginY == 0)) {
+	if (!skipFrame && !card.noCorners && (card.marginX == 0 && card.marginY == 0)) {
 		var w = card.version == 'battle' ? 2100 : getStandardWidth();
 
 		cardContext.drawImage(corner, 0, 0, scaleWidth(59/w), scaleWidth(59/w));
