@@ -171,6 +171,14 @@
 							<h5 class='padding input-description'>You may also click to edit opacity, position, size, and more</h5>
 						</div>
 						<div class='readable-background padding margin-bottom'>
+							<h5 class='padding margin-bottom input-description'>Save the current frame stack and text styling (color, font, shadow, outline, spacing) as a preset</h5>
+							<button class='input margin-bottom' onclick='saveFramePreset();'>Save Frame Preset</button>
+							<h5 class='padding margin-bottom input-description'>Apply a saved frame preset (frame stack + text styling)</h5>
+							<select id='load-frame-preset-options' class='input margin-bottom' onchange='applyFramePreset(this.value);'></select>
+							<h5 class='padding margin-bottom input-description'>Delete selected frame preset</h5>
+							<button class='input' onclick='deleteFramePreset();'>Delete Frame Preset</button>
+						</div>
+						<div class='readable-background padding margin-bottom'>
 							<h5 class='margin-bottom padding input-description'>Upload custom frame images</h5>
 							<div class='input-grid'>
 								<div class='padding drop-area'>

@@ -3082,6 +3082,63 @@ async function addFrame(additionalMasks = [], loadingFrame = false) {
 	document.querySelector('#frame-list').prepend(frameElement);
 	bottomInfoEdited();
 }
+const TEXT_STYLE_FIELDS = ['color', 'font', 'fontStyle', 'shadow', 'shadowX', 'shadowY', 'shadowBlur', 'outlineColor', 'outlineWidth', 'kerning', 'lineSpacing', 'align', 'justify'];
+function captureTextStyles() {
+	var textStyles = {};
+	Object.entries(card.text || {}).forEach(([key, textObject]) => {
+		var style = {};
+		TEXT_STYLE_FIELDS.forEach(field => {
+			if (textObject[field] !== undefined) {
+				style[field] = textObject[field];
+			}
+		});
+		textStyles[key] = style;
+	});
+	return textStyles;
+}
+async function saveFramePreset() {
+	var presetName = prompt('Enter the name you would like to save this frame preset under:');
+	if (!presetName) {return null;}
+	presetName = presetName.trim();
+	if (!presetName) {return null;}
+	var existingKeys = await cardDB.keys('framePresets');
+	if (existingKeys.includes(presetName)) {
+		if (!confirm('Would you like to overwrite the frame preset "' + presetName + '"?\n(Clicking "cancel" will affix a version number)')) {
+			var originalPresetName = presetName;
+			var presetNumber = 1;
+			while (existingKeys.includes(presetName)) {
+				presetName = originalPresetName + ' (' + presetNumber + ')';
+				presetNumber++;
+			}
+		}
+	}
+	var framesToSave = JSON.parse(JSON.stringify(card.frames));
+	framesToSave.forEach(frame => {
+		delete frame.image;
+		frame.masks.forEach(mask => delete mask.image);
+	});
+	var presetToSave = {
+		frames: framesToSave,
+		textStyles: captureTextStyles()
+	};
+	try {
+		await cardDB.set(presetName, presetToSave, 'framePresets');
+		loadAvailableFramePresets();
+	} catch (error) {
+		notify('Your frame preset failed to save (' + error.message + ').');
+	}
+}
+async function loadAvailableFramePresets() {
+	var presetKeys = await cardDB.keys('framePresets');
+	var select = document.querySelector('#load-frame-preset-options');
+	select.innerHTML = '<option selected="selected" disabled>None selected</option>';
+	presetKeys.sort().forEach(item => {
+		var presetOption = document.createElement('option');
+		presetOption.innerHTML = item;
+		presetOption.value = item;
+		select.appendChild(presetOption);
+	});
+}
 function removeFrame(event) {
 	card.frames.splice(getElementIndex(event.target.parentElement), 1);
 	event.target.parentElement.remove();
@@ -5621,4 +5678,5 @@ bindInputs('#show-guidelines', '#show-guidelines-2', true);
 // Load / init whatever
 loadScript('/js/frames/groupStandard-3.js');
 loadAvailableCards();
+loadAvailableFramePresets();
 initDraggableArt();
