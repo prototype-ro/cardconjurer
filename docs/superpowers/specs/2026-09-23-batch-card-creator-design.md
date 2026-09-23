@@ -5,9 +5,10 @@ Date: 2026-09-23
 ## Goal
 
 Generate many real cards unattended from a plain-text list: card name
-(imported from Scryfall), optional nickname, a saved frame preset,
-and whether to include art. Each row produces the same 3 files the
-Export tab already produces per card.
+(imported from Scryfall, optionally pinned to a specific set/print),
+optional nickname, a saved frame preset, and whether to include art.
+Each row produces the same 3 files the Export tab already produces
+per card.
 
 Builds on [2026-09-23-frame-presets-and-export-design.md](2026-09-23-frame-presets-and-export-design.md)
 (frame presets, Export tab) — both already merged.
@@ -149,27 +150,46 @@ New tab, "Batch", next to Export (same `toggleCreatorTabs` mechanism,
 - `<textarea id='batch-input'>` — one card per line:
 
   ```
-  Cardname | Nickname | FramePresetName | art-flag
+  Cardname | SetCode | CollectorNumber | Nickname | FramePresetName | art-flag
   ```
 
   - `Cardname` — required, passed verbatim to Scryfall's exact-name
     search (same as typing it into Import/Save's "Import a real card
     by name" field).
-  - `Nickname` — optional, blank allowed (`Card Name || Preset | art`).
-    Overwrites `card.text.nickname.text` after import, only if
-    non-blank.
+  - `SetCode` — optional, blank allowed. When given, picks that
+    specific printing (e.g. `MH3`) instead of Scryfall's
+    default/most-recent print, matched case-insensitively against
+    each result's `set` field.
+  - `CollectorNumber` — optional, blank allowed, only meaningful
+    together with `SetCode` (a set alone can still have many prints —
+    e.g. showcase/borderless variants share a set code with the
+    regular printing but differ by collector number). Matched as a
+    trimmed string against each result's `collector_number` field.
+  - `Nickname` — optional, blank allowed
+    (`Card Name | MH3 | 343 || Preset | art`). Overwrites
+    `card.text.nickname.text` after import, only if non-blank.
   - `FramePresetName` — required, must match a key in the
     `framePresets` IndexedDB store.
   - `art-flag` — required, literal `art` or `no-art`.
   - Blank lines ignored. Leading/trailing whitespace trimmed per
-    field.
+    field. This is the app's own structured format — pasting a
+    decklist (e.g. Moxfield's `1 Kaalia of the Vast (MH3) 343`
+    export syntax) directly into the textarea is not supported by the
+    app itself; translating that kind of list into this pipe-delimited
+    format is a task for whoever is preparing the batch input (may be
+    done conversationally, outside the app).
 
 - "Parse" button → splits the textarea into rows, renders a preview
-  `<table>` below: row #, cardname, nickname (or "—"), preset name
-  with ✅/❌ (checked against a fresh `cardDB.keys('framePresets')`
-  read), art-flag with ✅/❌ (valid only if exactly `art` or
-  `no-art`, case-insensitive). A row failing either check is styled
-  red and excluded from the run.
+  `<table>` below: row #, cardname (with set/number suffix shown if
+  given, e.g. "Kaalia of the Vast (MH3 #343)"), nickname (or "—"),
+  preset name with ✅/❌ (checked against a fresh
+  `cardDB.keys('framePresets')` read), art-flag with ✅/❌ (valid only
+  if exactly `art` or `no-art`, case-insensitive). A row failing
+  either check is styled red and excluded from the run. `SetCode`/
+  `CollectorNumber` are never validated at parse time (Scryfall is the
+  only source of truth for whether they match a real print) — a bad
+  set/number is only caught when the row actually runs, per step 2
+  below.
 
 - "Run Batch" button — disabled until at least one row has been
   parsed and is valid. Runs rows sequentially (never in parallel —
@@ -188,10 +208,11 @@ For each valid row, in order:
    `fetchScryfallData` never invokes its callback on a 404/no-match —
    see [js/creator-23.js](../../../js/creator-23.js), search
    `fetchScryfallData` — so an un-timed-out wait would hang the whole
-   batch on a single bad name):
+   batch on a single bad name), and — when `row.setCode` is given —
+   select that specific print before importing:
 
    ```js
-   function importCardByNameAsync(cardName, timeoutMs = 8000) {
+   function importCardByNameAsync(cardName, setCode, collectorNumber, timeoutMs = 8000) {
        return new Promise((resolve, reject) => {
            var settled = false;
            var timer = setTimeout(() => {
@@ -203,21 +224,47 @@ For each valid row, in order:
                clearTimeout(timer);
                if (!cards || cards.length === 0) {
                    reject(new Error('no match'));
-               } else {
-                   importCard(cards);
-                   resolve();
+                   return;
                }
+               importCard(cards); // sets scryfallCard, #import-index, runs changeCardIndex() on the default (index 0) print
+               if (setCode) {
+                   var matchIndex = cards.findIndex(c =>
+                       c.set && c.set.toLowerCase() === setCode.toLowerCase() &&
+                       (!collectorNumber || (c.collector_number || '').trim() === collectorNumber.trim())
+                   );
+                   if (matchIndex === -1) {
+                       reject(new Error('no printing found matching set "' + setCode + '"' + (collectorNumber ? ' #' + collectorNumber : '')));
+                       return;
+                   }
+                   document.querySelector('#import-index').value = matchIndex;
+                   changeCardIndex(); // re-run text import against the specific print
+               }
+               resolve();
            }, '');
        });
    }
    ```
 
-   `importCard(cards)` synchronously sets every `card.text[key].text`
-   field (title/mana/type/rules/pt/nickname/etc. — see
-   `changeCardIndex()`) before it kicks off its own *separate*,
-   un-awaitable async chain to fetch art and the set symbol. By the
-   time our promise resolves, all text content is already set; art
-   is still in flight.
+   `cards` here is the same array `importCard` assigns to the global
+   `scryfallCard`, in the same order — so an index found via
+   `cards.findIndex(...)` is directly usable as `#import-index`'s
+   value without any remapping (`importCard`'s dropdown-population
+   loop skips entries lacking `type_line`, but still assigns each
+   `<option>` its *original* array index as `value`, specifically so
+   this kind of direct indexing stays valid — see
+   [js/creator-23.js](../../../js/creator-23.js), search
+   `function importCard`).
+
+   `importCard(cards)` / `changeCardIndex()` synchronously set every
+   `card.text[key].text` field (title/mana/type/rules/pt/nickname/etc.)
+   before kicking off a *separate*, un-awaitable async chain to fetch
+   art and the set symbol *for whichever print is currently selected
+   in `#import-index`* — which is why the set/number re-selection
+   above must happen, and `changeCardIndex()` must be re-run, before
+   this promise resolves: it re-triggers that art/set-symbol fetch
+   against the correct print too, not just the text.
+
+   Called as: `await importCardByNameAsync(row.cardname, row.setCode, row.collectorNumber);`
 
 3. **Resolve art**, based on `row.artFlag`:
    - `art`: `importCard`'s internal art-fetch is already in flight
@@ -291,11 +338,21 @@ project, consistent with prior work):
 - Apply an old preset saved *before* this change (no `frameGroup`/
   `framePack` fields) — confirm it still applies frames + text styles
   exactly as before, no error from the missing fields.
-- Batch: 3-line input, one deliberately misspelled card name, one
-  `art`, one `no-art`. Confirm: the bad row is skipped with a
-  notification, the other two each produce 3 downloaded files with
-  correct text/frame/styling, the `art`-flagged card has real art,
-  the `no-art`-flagged card doesn't.
+- Batch: 4-line input — one deliberately misspelled card name, one
+  `art`, one `no-art`, one with a real card name plus a valid
+  `SetCode`/`CollectorNumber` pinning a specific (non-default) print.
+  Confirm: the bad row is skipped with a notification, the others
+  each produce 3 downloaded files with correct text/frame/styling,
+  the `art`-flagged card has real art, the `no-art`-flagged card
+  doesn't, and the pinned-print card's art/collector info actually
+  matches that specific printing (not Scryfall's default/most-recent
+  one).
+- A row with a `SetCode`/`CollectorNumber` that doesn't match any
+  real printing of that card — confirm it's skipped with a
+  notification naming the set/number that failed to match, and the
+  batch continues to the next row.
 - Confirm the preview table correctly flags an unknown preset name
   and an invalid art-flag value as red/invalid before "Run Batch" is
-  even enabled.
+  even enabled, and that a row with only `Cardname` + blank
+  `SetCode`/`CollectorNumber` still parses as valid (both fields are
+  optional).
