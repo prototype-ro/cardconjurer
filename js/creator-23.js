@@ -3168,6 +3168,17 @@ async function applyFramePreset(presetName) {
 		notify('Failed to apply frame preset "' + presetName + '" (' + error.message + ').');
 	}
 }
+async function deleteFramePreset() {
+	var presetName = document.querySelector('#load-frame-preset-options').value;
+	if (presetName) {
+		try {
+			await cardDB.delete(presetName, 'framePresets');
+			loadAvailableFramePresets();
+		} catch (error) {
+			notify('Failed to delete frame preset "' + presetName + '" (' + error.message + ').');
+		}
+	}
+}
 function removeFrame(event) {
 	card.frames.splice(getElementIndex(event.target.parentElement), 1);
 	event.target.parentElement.remove();
