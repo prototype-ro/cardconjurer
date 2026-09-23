@@ -5123,13 +5123,16 @@ const cardDB = {
 	open() {
 		if (this.db) {return Promise.resolve(this.db);}
 		return new Promise((resolve, reject) => {
-			var request = indexedDB.open('CardConjurerDB', 2);
+			var request = indexedDB.open('CardConjurerDB', 3);
 			request.onupgradeneeded = event => {
 				if (!event.target.result.objectStoreNames.contains('cards')) {
 					event.target.result.createObjectStore('cards');
 				}
 				if (!event.target.result.objectStoreNames.contains('framePresets')) {
 					event.target.result.createObjectStore('framePresets');
+				}
+				if (!event.target.result.objectStoreNames.contains('batchLists')) {
+					event.target.result.createObjectStore('batchLists');
 				}
 			};
 			request.onsuccess = event => {
