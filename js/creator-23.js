@@ -4885,6 +4885,57 @@ function renderBatchPreview() {
 	document.querySelector('#batch-run').disabled = !batchRows.some(row => row.cardname && row.presetValid && row.artFlagValid);
 	document.querySelector('#batch-summary').classList.add('hidden');
 }
+function importCardByNameAsync(cardName, setCode, collectorNumber, timeoutMs = 8000) {
+	return new Promise((resolve, reject) => {
+		var settled = false;
+		var timer = setTimeout(() => {
+			if (!settled) { settled = true; reject(new Error('timed out or not found')); }
+		}, timeoutMs);
+		fetchScryfallData(cardName, cards => {
+			if (settled) {return;}
+			settled = true;
+			clearTimeout(timer);
+			if (!cards || cards.length === 0) {
+				reject(new Error('no match'));
+				return;
+			}
+			importCard(cards);
+			if (setCode) {
+				var matchIndex = cards.findIndex(c =>
+					c.set && c.set.toLowerCase() === setCode.toLowerCase() &&
+					(!collectorNumber || (c.collector_number || '').trim() === collectorNumber.trim())
+				);
+				if (matchIndex === -1) {
+					reject(new Error('no printing found matching set "' + setCode + '"' + (collectorNumber ? ' #' + collectorNumber : '')));
+					return;
+				}
+				document.querySelector('#import-index').value = matchIndex;
+				changeCardIndex();
+			}
+			resolve();
+		}, '');
+	});
+}
+function waitForArtOrReset(artFlag) {
+	return new Promise(resolve => {
+		if (artFlag === 'no-art') {
+			uploadArt(fixUri('/img/blank.png'));
+			resolve();
+			return;
+		}
+		var previousArtSource = card.artSource;
+		var elapsed = 0;
+		var pollInterval = 200;
+		var timeoutMs = 6000;
+		var poll = setInterval(() => {
+			elapsed += pollInterval;
+			if (card.artSource !== previousArtSource || elapsed >= timeoutMs) {
+				clearInterval(poll);
+				resolve();
+			}
+		}, pollInterval);
+	});
+}
 //IMPORT/SAVE TAB
 function importCard(cardObject) {
 	scryfallCard = cardObject;
