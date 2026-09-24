@@ -3158,7 +3158,16 @@ async function applyFramePreset(presetName) {
 		// replay Frame Group + Pack + "Load Frame Version", if saved (older presets won't have these fields — skip this phase for them)
 		if (preset.frameGroup && preset.framePack) {
 			document.querySelector('#selectFrameGroup').value = preset.frameGroup;
-			await loadScriptAsync('/js/frames/group' + preset.frameGroup + '.js');
+			// group scripts call loadFramePacks(), which incidentally auto-loads
+			// the group's *default* pack via the shared, fire-and-forget loadScript().
+			// Suppress that one call so it can't race the specific pack we load next.
+			var originalLoadScript = loadScript;
+			loadScript = function() {};
+			try {
+				await loadScriptAsync('/js/frames/group' + preset.frameGroup + '.js');
+			} finally {
+				loadScript = originalLoadScript;
+			}
 			document.querySelector('#selectFramePack').value = preset.framePack;
 			await loadScriptAsync('/js/frames/pack' + preset.framePack + '.js');
 			await document.querySelector('#loadFrameVersion').onclick();
