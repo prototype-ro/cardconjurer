@@ -49,6 +49,17 @@ Default to a close-up or medium-tight shot with a visible pocket of dim surround
 
 If a figure's own limb or body part is transforming into, fusing with, or growing an object (a hand becoming a blade, an arm sprouting bark), describe it as one single continuous part — e.g. "an arm that ends in a jagged crystal blade, the crystal growing directly from the forearm." Never phrase this as the figure "gripping," "holding," or "wielding" a separate object, even if that's visually similar to what you intend — the image model reads "gripping X" as two distinct objects (a hand, and a separate item), which breaks the fused/transforming read entirely.
 
+## 7b. Large single-blade weapon geometry gotcha
+
+Oversized bladed weapons (greatswords, glaives, single tall blades held two-handed) reliably render as a shapeless flat slab — no visible cross-section, no consistent width along its length, ambiguous edge vs. flat — when described only by size and ornament ("a massive curved greatsword," "an ornate blade taller than she is"). This is a distinct failure from Rule 7's fusion gotcha: here the object is held correctly, but its own geometry collapses. It gets worse in a symmetrical, vertical, frontal composition, where a long blade held upright reads as just another vertical shape alongside wings/limbs and loses its silhouette entirely.
+
+Fixes, apply together when a large single-blade weapon is the focal object:
+- **State the cross-section explicitly**: "a blade with a clear diamond cross-section" or "a flat blade with a raised central fuller running its length" — never leave width/thickness to be inferred from size alone.
+- **Anchor the width to something concrete**, not just overall length: "roughly a hand's-width at the base, tapering evenly to a point" rather than "massive" or "towering" alone.
+- **State each hand's grip point relative to a named part of the weapon** (hilt, crossguard, grip-wrap) rather than just "gripping the sword" — e.g. "one hand at the crossguard, the other lower on the wrapped grip" — an unanchored two-handed grip on an oversized object is exactly where the model loses track of hand-to-object relationship.
+- **Give the blade a resting point or clear termination** (point driven into the ground, point held level, tip resting on a shoulder) rather than letting it run off the bottom of the frame — an ambiguous, cropped blade base is a second place the shape can fall apart.
+- **Break bilateral symmetry** if the weapon is held centrally in an otherwise symmetrical pose (e.g. wings spread evenly on both sides) — angle the blade a few degrees off the body's centerline, or offset it against one side, so its edges don't visually merge with a wing or limb silhouette behind it.
+
 ## 8. Banned words
 
 The following words are banned as mid-scene description, anywhere in the body of the prompt: **epic, majestic, dramatic, stunning, breathtaking, mystical, ethereal, awe-inspiring**. They are empty intensifiers that give the image model no concrete visual instruction and are a strong signal of generic AI-fantasy prose.
