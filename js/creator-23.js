@@ -3085,6 +3085,58 @@ async function addFrame(additionalMasks = [], loadingFrame = false) {
 	bottomInfoEdited();
 }
 const TEXT_STYLE_FIELDS = ['color', 'font', 'fontStyle', 'shadow', 'shadowX', 'shadowY', 'shadowBlur', 'outlineColor', 'outlineWidth', 'kerning', 'lineSpacing', 'align', 'justify'];
+// Text styling can also be set via inline {codes} typed into the text itself
+// (e.g. {center}, {fontcolor#fff}, {shadowcolor#000}) — writeText() only ever
+// reassigns local variables while parsing those, it never writes them back
+// onto the textObject, so TEXT_STYLE_FIELDS alone misses anything set this
+// way. This mirrors writeText()'s own code-matching order/semantics (see the
+// code cascade starting around 'possibleCode == \'left\'') and converts the
+// raw-pixel values inline codes use back to the normalized (0-1 of card
+// width/height) units the persisted fields use, via the inverse of
+// scaleWidth()/scaleHeight(). fontStyle (the {i}/{bold} toggle) and
+// lineSpacing (no inline code exists for it) are intentionally not covered.
+function parseInlineTextStyle(text) {
+	var style = {};
+	var alignCodes = {left: 'left', center: 'center', right: 'right'};
+	var justifyCodes = {'justify-left': 'left', 'justify-center': 'center', 'justify-right': 'right'};
+	var tokens = (text || '').match(/\{[^}]*\}/g) || [];
+	tokens.forEach(token => {
+		var raw = token.slice(1, -1);
+		var code = raw.toLowerCase();
+		if (alignCodes[code]) {
+			style.align = alignCodes[code];
+		} else if (justifyCodes[code]) {
+			style.justify = justifyCodes[code];
+		} else if (code.includes('fontcolor')) {
+			style.color = raw.replace(/fontcolor/i, '');
+		} else if (code.includes('fontsize')) {
+			// fontSize is a separate per-edit override, not part of frame preset styling — skip
+		} else if (code.startsWith('font')) {
+			style.font = raw.replace(/^font/i, '');
+		} else if (code.includes('outlinecolor')) {
+			style.outlineColor = raw.replace(/outlinecolor/i, '');
+		} else if (code.includes('outline')) {
+			style.outlineWidth = (parseInt(code.replace('outline', '')) || 0) / card.height;
+		} else if (code.includes('kerning')) {
+			style.kerning = (parseInt(code.replace('kerning', '')) || 0) / card.width;
+		} else if (code.includes('shadow')) {
+			if (code.includes('color')) {
+				style.shadow = raw.replace(/shadowcolor/i, '');
+			} else if (code.includes('blur')) {
+				style.shadowBlur = (parseInt(code.replace('shadowblur', '')) || 0) / card.height;
+			} else if (code.includes('shadowx')) {
+				style.shadowX = (parseInt(code.replace('shadowx', '')) || 0) / card.width;
+			} else if (code.includes('shadowy')) {
+				style.shadowY = (parseInt(code.replace('shadowy', '')) || 0) / card.height;
+			} else {
+				var offset = parseInt(code.replace('shadow', '')) || 0;
+				style.shadowX = offset / card.width;
+				style.shadowY = offset / card.height;
+			}
+		}
+	});
+	return style;
+}
 function captureTextStyles() {
 	var textStyles = {};
 	Object.entries(card.text || {}).forEach(([key, textObject]) => {
@@ -3094,6 +3146,9 @@ function captureTextStyles() {
 				style[field] = textObject[field];
 			}
 		});
+		// Inline-code values reflect what's actually visible right now, so they
+		// take priority over the (possibly stale) persisted defaults above.
+		Object.assign(style, parseInlineTextStyle(textObject.text));
 		textStyles[key] = style;
 	});
 	return textStyles;
