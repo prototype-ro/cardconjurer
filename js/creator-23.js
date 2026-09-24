@@ -5036,6 +5036,68 @@ function renderBatchSummary(stoppedEarly) {
 	summary.innerHTML = html;
 	summary.classList.remove('hidden');
 }
+async function saveBatchList() {
+	var listName = prompt('Enter the name you would like to save this batch list under:');
+	if (!listName) {return null;}
+	listName = listName.trim();
+	if (!listName) {return null;}
+	try {
+		var existingKeys = await cardDB.keys('batchLists');
+		if (existingKeys.includes(listName)) {
+			if (!confirm('Would you like to overwrite the batch list "' + listName + '"?\n(Clicking "cancel" will affix a version number)')) {
+				var originalListName = listName;
+				var listNumber = 1;
+				while (existingKeys.includes(listName)) {
+					listName = originalListName + ' (' + listNumber + ')';
+					listNumber++;
+				}
+			}
+		}
+		await cardDB.set(listName, document.querySelector('#batch-input').value, 'batchLists');
+		loadAvailableBatchLists();
+	} catch (error) {
+		notify('Your batch list failed to save (' + error.message + ').');
+	}
+}
+async function loadAvailableBatchLists() {
+	try {
+		var listKeys = await cardDB.keys('batchLists');
+		var select = document.querySelector('#load-batch-list-options');
+		select.innerHTML = '<option selected="selected" disabled>None selected</option>';
+		listKeys.sort().forEach(item => {
+			var listOption = document.createElement('option');
+			listOption.innerHTML = item;
+			listOption.value = item;
+			select.appendChild(listOption);
+		});
+	} catch (error) {
+		notify('Failed to load batch lists (' + error.message + ').');
+	}
+}
+async function loadBatchList(listName) {
+	if (!listName) {return;}
+	try {
+		var listText = await cardDB.get(listName, 'batchLists');
+		if (listText === undefined) {
+			notify(listName + ' failed to load.', 5);
+			return;
+		}
+		document.querySelector('#batch-input').value = listText;
+	} catch (error) {
+		notify('Failed to load batch list "' + listName + '" (' + error.message + ').');
+	}
+}
+async function deleteBatchList() {
+	var listName = document.querySelector('#load-batch-list-options').value;
+	if (listName) {
+		try {
+			await cardDB.delete(listName, 'batchLists');
+			loadAvailableBatchLists();
+		} catch (error) {
+			notify('Failed to delete batch list "' + listName + '" (' + error.message + ').');
+		}
+	}
+}
 //IMPORT/SAVE TAB
 function importCard(cardObject) {
 	scryfallCard = cardObject;
@@ -5985,6 +6047,7 @@ document.querySelector('#loadFrameVersion').addEventListener('click', () => {
 loadScript('/js/frames/groupStandard-3.js');
 loadAvailableCards();
 loadAvailableFramePresets();
+loadAvailableBatchLists();
 initDraggableArt();
 
 // Canvas text is a static bitmap: if a custom @font-face (e.g. the title font)
