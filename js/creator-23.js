@@ -4833,6 +4833,58 @@ function exportFrameAndText() {
 function exportTextOnly() {
 	exportVariant(true, true, '-textonly');
 }
+var batchRows = [];
+async function parseBatchInput() {
+	var lines = document.querySelector('#batch-input').value.split('\n');
+	var presetKeys = await cardDB.keys('framePresets');
+	batchRows = [];
+	lines.forEach(line => {
+		if (!line.trim()) {return;}
+		var parts = line.split('|').map(part => part.trim());
+		var [cardname, setCode, collectorNumber, nickname, presetName, artFlag] = parts;
+		var artFlagNormalized = (artFlag || '').toLowerCase();
+		batchRows.push({
+			cardname: cardname || '',
+			setCode: setCode || '',
+			collectorNumber: collectorNumber || '',
+			nickname: nickname || '',
+			presetName: presetName || '',
+			artFlag: artFlagNormalized,
+			presetValid: presetKeys.includes(presetName || ''),
+			artFlagValid: artFlagNormalized === 'art' || artFlagNormalized === 'no-art',
+			status: 'pending',
+			reason: ''
+		});
+	});
+	renderBatchPreview();
+}
+function renderBatchPreview() {
+	var container = document.querySelector('#batch-preview-rows');
+	container.innerHTML = '';
+	batchRows.forEach((row, index) => {
+		var rowValid = row.cardname && row.presetValid && row.artFlagValid;
+		var line = document.createElement('h5');
+		line.className = 'padding input-description' + (rowValid ? '' : ' batch-row-invalid');
+		var printSuffix = row.setCode ? ' (' + row.setCode.toUpperCase() + (row.collectorNumber ? ' #' + row.collectorNumber : '') + ')' : '';
+		var statusText = {pending: '—', running: '⏳', success: '✅', error: '❌ ' + row.reason}[row.status] || '—';
+		line.innerHTML = 'Row ' + (index + 1) + ': ' + (row.cardname || '(missing cardname)') + printSuffix +
+			' — Nickname: ' + (row.nickname || '—') +
+			' — Preset: ' + (row.presetValid ? '✅' : '❌') + ' ' + row.presetName +
+			' — Art: ' + (row.artFlagValid ? '✅' : '❌') + ' ' + row.artFlag +
+			' — Status: ' + statusText;
+		if (row.status === 'error') {
+			var retryButton = document.createElement('button');
+			retryButton.className = 'input';
+			retryButton.innerHTML = 'Retry';
+			retryButton.onclick = () => retryBatchRow(index);
+			line.appendChild(retryButton);
+		}
+		container.appendChild(line);
+	});
+	document.querySelector('#batch-preview').classList.toggle('hidden', batchRows.length === 0);
+	document.querySelector('#batch-run').disabled = !batchRows.some(row => row.cardname && row.presetValid && row.artFlagValid);
+	document.querySelector('#batch-summary').classList.add('hidden');
+}
 //IMPORT/SAVE TAB
 function importCard(cardObject) {
 	scryfallCard = cardObject;
