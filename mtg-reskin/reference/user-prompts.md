@@ -6,11 +6,29 @@ Note on count: the implementation plan estimated 24 prompts before the exact set
 
 Each prompt below is numbered in original order and followed by a **Demonstrates:** line naming the specific art-template rule(s) it best illustrates, with a concrete detail quoted from that prompt.
 
+## Index by rule
+
+Use this table to jump straight to examples of a given rule instead of scanning all 21 entries.
+
+| Rule | Best-demonstrating entries |
+|---|---|
+| 1. Who/What/Why/Where brief | 7, 11, 13 |
+| 2. Diegetic lighting | 2, 5, 8, 10, 12, 14, 17, 20 |
+| 3. Intricacy | 1, 16 |
+| 4. Palette discipline | 1, 16 |
+| 5. Framing for card crop | 3, 6, 9, 18, 21 |
+| 6. Framing tightness | 4, 15, 21 |
+| 7. Body-part continuity gotcha | 16 |
+| 8. Banned words | — (no entry below is annotated as the primary example; all 21 prompts comply) |
+| 9. Closing suffix | — (structural — see the closing sentence of every entry rather than a single standout example) |
+| 10. No text, frames, or artist names | — (structural — every entry complies; no single entry stands out as the clearest example) |
+| Character-bible reuse pattern (not a numbered art-template rule; flagged for future naming/theme-bible skills) | 15, 16, 17 (exception), 18, 19 |
+
 ---
 
 **1.** "The Gilded Chalice - a devil's gift. Half figure Baroque oil painting portrait: an aged, weary aristocrat in heavy embroidered robes and fur trimmed mantle, seated in a carved high backed chair, lifting an ornate gold chalice toward his lips with one ring laden hand, head tilted down so eyes are shadowed beneath a heavy brow, other hand resting loosely on the armrest. The chalice catches warm candlelight on its near side where liquid gleams like red wine; the far inner rim sits in shadow where it reads as black ichor. The chalice bowl bears an engraved frieze of tiny relief figures circling hand to hand as if pulled under. Face and crown occupy the upper vertical center; chalice and raised hand are the focal midpoint; robes fade into shadow in the lower third. Rich warm chiaroscuro from a single unseen candle. Deep reds, aged gold, near black shadows. Heavy textured brushwork. Magic: The Gathering artifact card art style. Intricate, atmospheric, high detail."
 
-**Demonstrates:** Rule 4 (Palette discipline) — "Deep reds, aged gold, near black shadows" is a named 2–3 color list, nearly identical to the exact example phrasing used in the rule itself.
+**Demonstrates:** Rule 3 (Intricacy) — "an engraved frieze of tiny relief figures circling hand to hand as if pulled under" is a specific, nameable engraved micro-narrative, not a generic "ornate" adjective. Also demonstrates Rule 4 (Palette discipline): "Deep reds, aged gold, near black shadows" is a named 2–3 color list, nearly identical to the exact example phrasing used in the rule itself.
 
 ---
 
@@ -94,13 +112,13 @@ Each prompt below is numbered in original order and followed by a **Demonstrates
 
 **15.** "Ob Nixilis, a horned demon lord with purple grey skin and large dark red brown membranous bat wings, wearing ornate bronze gold armor with sculpted pauldrons and a crested horned helm with jagged spikes. Caught mid cast, one clawed hand thrust forward unleashing a concentrated violet black energy bolt toward an off frame target, other hand braced back. Expression sharp and merciless. Hazy battlefield background with drifting smoke and indistinct ruined shapes. The energy bolt is the primary light source, casting hard violet tinted highlights across his gold armor and face while wings and background recede into charcoal grey haze. Muted teal grey and bronze palette, violet black energy as the sole saturated accent. Tight dynamic composition for an instant spell card: hand and bolt in lower middle frame, face and helm spikes clear of the top edge. Painterly digital fantasy illustration, Magic: The Gathering card art style, high detail."
 
-**Demonstrates:** Character-bible reuse pattern (5-prompt Ob Nixilis set, #1 of 5) — introduces the fixed physical description ("purple grey skin... bronze gold armor... crested horned helm with jagged spikes") that prompts 16–19 repeat near-verbatim, varying only the action clause ("Caught mid cast... unleashing a... energy bolt"). Also demonstrates Rule 6 (Framing tightness): "Tight dynamic composition for an instant spell card: hand and bolt in lower middle frame" adapts the standard framing band to an instant-speed shot.
+**Demonstrates:** Character-bible reuse pattern (5-prompt Ob Nixilis set, #1 of 5) — introduces the fixed physical description ("purple grey skin... bronze gold armor... crested horned helm with jagged spikes") that prompts 16, 18, and 19 repeat near-verbatim, varying only the action clause ("Caught mid cast... unleashing a... energy bolt"). (Prompt 17 is the deliberate exception to this bible — see its own annotation.) Also demonstrates Rule 6 (Framing tightness): "Tight dynamic composition for an instant spell card: hand and bolt in lower middle frame" adapts the standard framing band to an instant-speed shot.
 
 ---
 
 **16.** "Ob Nixilis, a horned demon lord with purple grey skin and large membranous bat wings spread wide in dark red brown, wearing ornate bronze gold armor with sculpted pauldrons and a crested horned helm with jagged spikes. His forearm is fused with the Infinity Gauntlet, golden knuckles set with all six Infinity Stones, raised clenched at chest height as the focal point; other clawed hand braced at his side. Background: ancient carved stone and gold temple wall with faint reliefs, plain and uncluttered. Lighting: soft even temple light with hard specular highlights on gold armor; six Stones emit soft overlapping glows — purple, blue, red, orange, green, yellow — radiating cleanly across his chest, no shattered glass or crystal effects. Face and horns legible in cool shadow rimmed by mixed colored light. Muted teal grey and bronze palette; gauntlet colors as sole saturated accents. Symmetrical frontal composition, face and gauntlet centered. Painterly digital fantasy illustration, Magic: The Gathering card art style, high detail."
 
-**Demonstrates:** Character-bible reuse pattern (#2 of 5) — repeats the same fixed physical description as #15/17/18/19 verbatim ("purple grey skin and large membranous bat wings... bronze gold armor with sculpted pauldrons and a crested horned helm with jagged spikes"), changing only the mode clause to the Infinity Gauntlet fusion. Also demonstrates Rule 3 (Intricacy): "golden knuckles set with all six Infinity Stones" is a specific, nameable detail (not a generic "ornate"), and Rule 7 (Body-part continuity): the gauntlet is described as "fused with" his forearm rather than "gripping" it.
+**Demonstrates:** Character-bible reuse pattern (#2 of 5) — repeats the same fixed physical description as #15/18/19 near-verbatim ("purple grey skin and large membranous bat wings... bronze gold armor with sculpted pauldrons and a crested horned helm with jagged spikes"; wording drifts slightly, e.g. "sculpted pauldrons" here vs. "sculpted shoulder pauldrons" in #18/19), changing only the mode clause to the Infinity Gauntlet fusion. (Prompt 17 is the deliberate exception to this bible — see its own annotation.) Also demonstrates Rule 3 (Intricacy): "golden knuckles set with all six Infinity Stones" is a specific, nameable detail (not a generic "ornate"), Rule 7 (Body-part continuity): the gauntlet is described as "fused with" his forearm rather than "gripping" it, and Rule 4 (Palette discipline): "Muted teal grey and bronze palette; gauntlet colors as sole saturated accents" is an explicit, closed color list.
 
 ---
 
