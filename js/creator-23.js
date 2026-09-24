@@ -4945,7 +4945,7 @@ async function runBatchRow(index) {
 		await applyFramePreset(row.presetName);
 		await importCardByNameAsync(row.cardname, row.setCode, row.collectorNumber);
 		await waitForArtOrReset(row.artFlag);
-		if (row.nickname) {
+		if (row.nickname && card.text.nickname) {
 			card.text.nickname.text = row.nickname;
 			textEdited();
 		}
@@ -5014,6 +5014,7 @@ async function runRemainingBatchRows() {
 	await runBatch(indexes);
 }
 function renderBatchSummary(stoppedEarly) {
+	renderBatchPreview();
 	var succeeded = batchRows.filter(row => row.status === 'success').length;
 	var failed = batchRows.filter(row => row.status === 'error');
 	var notRun = batchRows.filter(row => row.status === 'pending' && row.cardname && row.presetValid && row.artFlagValid).length;
@@ -5027,7 +5028,6 @@ function renderBatchSummary(stoppedEarly) {
 	}
 	summary.innerHTML = html;
 	summary.classList.remove('hidden');
-	renderBatchPreview();
 }
 //IMPORT/SAVE TAB
 function importCard(cardObject) {
