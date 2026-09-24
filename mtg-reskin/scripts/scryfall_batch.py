@@ -1,6 +1,18 @@
+"""Batch-enrich a decklist with Scryfall card data.
+
+Usage:
+    echo '<decklist>' | python3 scryfall_batch.py
+
+Reads a Moxfield-style decklist (one "<quantity> <name>" per line) from
+stdin, batches lookups against Scryfall's /cards/collection endpoint
+(<=75 identifiers per request), and writes a JSON array of enriched
+card records to stdout.
+"""
+
 import json
 import re
 import sys
+import urllib.error
 import urllib.request
 
 SCRYFALL_COLLECTION_URL = "https://api.scryfall.com/cards/collection"
@@ -17,6 +29,7 @@ def parse_decklist(text: str) -> list[dict]:
             continue
         match = line_re.match(line)
         if not match:
+            print(f"Warning: skipping unparseable line: {line!r}", file=sys.stderr)
             continue
         quantity, name = match.groups()
         entries.append({"quantity": int(quantity), "name": name})
@@ -41,8 +54,11 @@ def fetch_collection(identifiers: list[dict]) -> list[dict]:
         },
         method="POST",
     )
-    with urllib.request.urlopen(request) as response:
-        body = json.loads(response.read())
+    try:
+        with urllib.request.urlopen(request, timeout=30) as response:
+            body = json.loads(response.read())
+    except (urllib.error.URLError, json.JSONDecodeError) as e:
+        raise RuntimeError(f"Scryfall request failed: {e}") from e
     return body.get("data", [])
 
 
