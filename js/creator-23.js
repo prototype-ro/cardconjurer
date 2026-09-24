@@ -3161,6 +3161,7 @@ async function applyFramePreset(presetName) {
 			// group scripts call loadFramePacks(), which incidentally auto-loads
 			// the group's *default* pack via the shared, fire-and-forget loadScript().
 			// Suppress that one call so it can't race the specific pack we load next.
+			clearTimeout(autoFrameTimer); // prevent a pending Auto Frame redraw from firing loadScript() during the suppression window below
 			var originalLoadScript = loadScript;
 			loadScript = function() {};
 			try {
