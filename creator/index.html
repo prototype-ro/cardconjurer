@@ -716,7 +716,7 @@
 					<div id='creator-menu-batch' class='hidden'>
 						<div class='readable-background margin-bottom padding'>
 							<h5 class='margin-bottom padding input-description'>One card per line: Cardname | SetCode | CollectorNumber | Nickname | FramePresetName | art-flag<br>SetCode, CollectorNumber, and Nickname may be left blank. art-flag must be exactly "art" or "no-art".<br>Example: Lightning Bolt | | | | MyRedPreset | art</h5>
-							<textarea id='batch-input' class='input margin-bottom' rows='8' placeholder='Lightning Bolt | | | | MyRedPreset | art'></textarea>
+							<textarea id='batch-input' class='input margin-bottom' rows='8' placeholder='Lightning Bolt | | | | MyRedPreset | art' oninput='document.querySelector("#batch-run").disabled = true;'></textarea>
 							<button id='batch-parse' class='input' onclick='parseBatchInput();'>Parse</button>
 						</div>
 						<div class='readable-background margin-bottom padding'>

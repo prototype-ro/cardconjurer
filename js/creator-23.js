@@ -4901,8 +4901,12 @@ function importCardByNameAsync(cardName, setCode, collectorNumber, timeoutMs = 8
 				reject(new Error('no match'));
 				return;
 			}
-			importCard(cards);
 			if (setCode) {
+				// Skip importCard()'s own changeCardIndex() call here — it would
+				// run once against the default (wrong) print, then run again
+				// below against the corrected one, racing two concurrent async
+				// art fetches for the same card name against each other.
+				importCard(cards, true);
 				var matchIndex = cards.findIndex(c =>
 					c.set && c.set.toLowerCase() === setCode.toLowerCase() &&
 					(!collectorNumber || (c.collector_number || '').trim() === collectorNumber.trim())
@@ -4913,6 +4917,8 @@ function importCardByNameAsync(cardName, setCode, collectorNumber, timeoutMs = 8
 				}
 				document.querySelector('#import-index').value = matchIndex;
 				changeCardIndex();
+			} else {
+				importCard(cards);
 			}
 			resolve();
 		}, setCode ? 'prints' : '');
@@ -5116,7 +5122,7 @@ async function deleteBatchList() {
 	}
 }
 //IMPORT/SAVE TAB
-function importCard(cardObject) {
+function importCard(cardObject, skipChangeCardIndex) {
 	scryfallCard = cardObject;
 	const importIndex = document.querySelector('#import-index');
 	importIndex.innerHTML = null;
@@ -5136,7 +5142,9 @@ function importCard(cardObject) {
 		}
 		optionIndex ++;
 	});
-	changeCardIndex();
+	if (!skipChangeCardIndex) {
+		changeCardIndex();
+	}
 }
 
 function scryfallCardFromText(text) {
