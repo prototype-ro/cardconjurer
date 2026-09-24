@@ -4814,10 +4814,10 @@ function downloadCard(alt = false, jpeg = false) {
 		}
 	}
 }
-function exportVariant(skipArt, skipFrame, suffix) {
+function exportVariant(skipArt, skipFrame, suffix, nameOverride) {
 	drawCard(skipArt, skipFrame);
 	var imageDataURL = cardCanvas.toDataURL('image/png');
-	var imageName = getCardName() + suffix + '.png';
+	var imageName = (nameOverride || getCardName()) + suffix + '.png';
 	const downloadElement = document.createElement('a');
 	downloadElement.download = imageName;
 	downloadElement.target = '_blank';
