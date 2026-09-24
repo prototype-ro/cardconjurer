@@ -37,7 +37,7 @@ This is a **reduced-depth sample**, per the design spec's cost trade-off for non
 
 **Decisive moment:** the targeted spell caught and unraveled *mid-flight*, on the way to its target — never a spell that has already resolved, and never a static magical duel with no travelling projectile. The countered spell should have a distinct color/texture of its own (per art-template Rule 2) that visibly comes apart or reverses direction under the counter's separate light.
 
-**Per-color notes:** almost exclusively blue in this sample — counterspell is one of the roles that doesn't spread across the wheel; red and white occasionally *answer* a counter-adjacent effect but rarely counter outright, so this section stays blue-only rather than force other colors into it. Blue counterspell staging: cool indigo/teal caster's-own magic (per art-template's Blue color conventions in `creature/SKILL.md`, which apply to any blue caster regardless of card type) meeting the incoming spell's unrelated color, the two kept visually distinct exactly per art-template Rule 2 — the counter should never just be "more blue," it should be a different-colored intrusion cancelling a different-colored spell.
+**Per-color notes:** almost exclusively blue in this sample — counterspell is one of the roles that doesn't spread across the wheel; red and white occasionally *answer* a counter-adjacent effect but rarely counter outright, so this section stays blue-only rather than force other colors into it. Blue counterspell staging: cool indigo/teal caster's-own magic (per `creature/SKILL.md`'s Blue color conventions, a sibling type skill's rule that applies to any blue caster regardless of card type) meeting the incoming spell's unrelated color, the two kept visually distinct exactly per art-template Rule 2 — the counter should never just be "more blue," it should be a different-colored intrusion cancelling a different-colored spell.
 
 **Worked examples:**
 1. *(Based on Counterspell.)* A hooded caster's raised palm catches an incoming white-hot bolt inches from impact, cyan-white counter-light spider-webbing outward from the point of contact and visibly overpowering the bolt's own warmer glow, the bolt's leading edge already flickering out.
@@ -64,6 +64,8 @@ This is a **reduced-depth sample**, per the design spec's cost trade-off for non
 **Per-color notes:**
 - **Blue** (card draw as pure information/insight): a spell effect visibly pulling cards or knowledge toward the caster, light sourced from the drawn material itself.
 - **Black** (card draw with a cost — sacrifice, life, discard): stage the cost and the gain in the same frame, per Removal's black convention above — a sacrificed creature's essence visibly flowing into the cards being drawn.
+
+White, red, and green card draw were too thin in this sample to support a per-color convention — fall back on the shared decisive-moment description above for those colors rather than forcing a color-specific register.
 
 **Worked examples:**
 1. *(Blue, based on Wheel and Deal.)* A caster's hand fans open as seven cards simultaneously slide into it from a spinning cyan vortex hovering at chest height, the vortex's far edge still visibly drawing in loose motes of light.

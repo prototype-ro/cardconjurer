@@ -18,7 +18,7 @@ This is a **reduced-depth sample**, per the design spec's cost trade-off for non
 
 ## Removal
 
-**Decisive moment:** the instant of destruction itself, staged as visceral and internal rather than a clean external strike — since sorcery-speed removal can't ambush anything, its visual hook is usually that the destruction is more total or more personally costly than an instant's version, not that it's sudden.
+**Decisive moment:** the instant of destruction itself, staged as visceral and internal rather than a clean external strike — since sorcery-speed removal can't ambush anything, its visual hook is usually that the destruction reads as more total or more final than an instant's version, not that it's sudden.
 
 **Per-color notes:**
 - **Black** (destroy target creature/planeswalker as internal combustion): the destruction erupts from *inside* the target — a chest cavity bursting open with fire or light from within — rather than an external blow landing. This reads as blacker and more total than a simple sword-strike.
@@ -61,6 +61,8 @@ Essentially absent at sorcery speed — counterspells target spells on the stack
 - **Blue** (methodical, scholarly draw): a caster examining/selecting with visible tools (a lens, a candle, a ledger) — draw framed as diligence and technique rather than a burst of magic.
 - **Black** (draw at a cost, mirroring the instant-speed convention): pair the card-gain with a visible cost in the same frame — a sacrificed creature's remains, a draining life-glow.
 
+White, red, and green card draw were too thin in this sample to support a per-color convention — fall back on the shared decisive-moment description above for those colors rather than forcing a color-specific register.
+
 **Worked examples:**
 1. *(Blue, based on Careful Study.)* A horned, robed scholar leans in close over an open book by candlelight, one hand holding the candle aloft and the other steadying a small lens against a glinting object on the desk, stacks of books receding into warm dark at the frame's edges.
 2. *(Black, based on Stinging Study.)* A caster's outstretched hand siphons a thin stream of pale light directly from a commander-sized figure standing at their side, cards visibly coalescing out of the siphoned light before settling into the caster's other hand.
@@ -87,6 +89,8 @@ Essentially absent at sorcery speed — counterspells target spells on the stack
 - **Black** (tutoring as bargaining with something looming and dangerous): the same infernal-reach register as the instant version, but sorcery speed allows the looming figure to be fully shown rather than half-glimpsed.
 - **Green** (tutoring as ritual summons, when fetching a creature directly onto the battlefield): a full ring of supplicant/tribal figures calling something forth from the earth or void, the found creature emerging mid-summon rather than already standing.
 - **White** (tutoring as invoking sanctioned lore): consistent with the instant version — a single lit tome/relic-shelf, one item in hard focus.
+
+Blue is omitted here by design, not oversight: blue tutoring is overwhelmingly instant-speed in this sample (Mystical Tutor, etc.) — see the Instant skill's Tutor section for that register.
 
 **Worked examples:**
 1. *(Black, based on Demonic Tutor.)* A robed figure reaches upward with both hands toward a massive horned shape looming out of red-black haze above her, her own upturned face lit only by a faint blue glow rising from her own open palms — the power flowing down to her, not yet grasped.
