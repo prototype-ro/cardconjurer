@@ -20,7 +20,7 @@ The new name must not be the printed Magic card name, in whole or as a thinly re
 
 ## 4. Unique across the deck
 
-No two cards in the same deck may share a new name, full stop — this is checked against the orchestrator's used-names list (see the pipeline's faction ledger), not just eyeballed per batch.
+No two cards in the same deck may share a new name, full stop — this is checked against the orchestrator's used-names list, a separate running input from the faction ledger that each batch call also receives, not just eyeballed per batch.
 
 **Worked example:** a deck has two removal spells with similar oracle text — one exiles a creature, one destroys it. If both get named independently by role (Rule 2) they risk converging on something like "The Ranger's Judgment" for both. The fix is not to weaken either name's fit to its own mechanic; it's to differentiate them along an axis the theme already supports — one becomes "The Ranger's Judgment" (the exile effect, framed as a permanent sending-away) and the other "The Ranger's Reckoning" (the destroy effect, framed as final and violent) — same character-voice, same faction register, but textually distinct strings. If two cards would also collide on evoking the *same specific named character* (not just a similar mechanic), that's not a uniqueness clash to resolve by rewording — it's the canonical-name collision case in Rule 6 below, which has its own resolution path.
 
@@ -38,10 +38,13 @@ Each copy of a basic land within a faction gets its own distinct named location,
 
 When two or more cards in the deck plausibly evoke the **same specific theme-canon character** (not just a similar role or a similar vibe — the same named figure), only one of them gets to claim that character's bare canonical name. This is different from Rule 4's ordinary uniqueness check: two cards can fail to collide on the exact name string while still both clearly being "Aragorn," and that's the case this rule exists for.
 
+Before naming, check the faction ledger for an existing claim on this character (see Section 8) — do not rely on remembering earlier batches' decisions.
+
 **Resolution — first-claim wins:**
 - Process cards in decklist order (or, if the collision needs to be resolved out of order, whichever card is most central to the commander's own story wins the tie).
 - The **first** card to map to that character gets the **bare canonical name** — just "Aragorn," no qualifier.
 - **Every other card** that maps to the same character gets an **epithet or title variant of that same character** — never a fully unrelated name. The point of the rule is to keep the connection to the evoked character legible across every card that represents them, while still giving each card a textually unique name.
+- **The "most central to the commander's story" tiebreak only applies to a collision discovered within a single batch, before any of the colliding cards has been committed to the faction ledger.** The pipeline's faction ledger grows append-only across batches — there is no batch-revision step, so a name once written to the ledger is final. If a later batch's card collides with a character name already committed in an earlier batch, decklist position and narrative centrality no longer matter: the ledger entry wins outright, and the new card takes an epithet/title variant, regardless of how central that new card is to the commander's story.
 
 **Worked example:** a deck has three cards that all plausibly represent Aragorn — a legendary creature, an equipment, and a saga. Decklist order (or commander-centrality) gives the legendary creature first claim: it becomes simply "Aragorn." The equipment does not become an unrelated sword name like "Andúril" in isolation (that would sever the visible link for a reader who doesn't already know the lore) — it becomes "Strider's Blade," an epithet-anchored variant that still reads as *his* weapon. The saga becomes "Oath of the Ranger-King" — again anchored to an epithet ("Ranger-King") rather than a generic saga title. All three remain uniquely named per Rule 4, all three remain legible as depicting Aragorn, and none of them is a disconnected alias that would require outside knowledge to tie back to the character.
 
