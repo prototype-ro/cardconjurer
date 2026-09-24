@@ -631,7 +631,7 @@ async function runBatchRow(index) {
 		await applyFramePreset(row.presetName);
 		await importCardByNameAsync(row.cardname, row.setCode, row.collectorNumber);
 		await waitForArtOrReset(row.artFlag);
-		if (row.nickname) {
+		if (row.nickname && card.text.nickname) {
 			card.text.nickname.text = row.nickname;
 			textEdited();
 		}
@@ -705,6 +705,7 @@ async function runRemainingBatchRows() {
 	await runBatch(indexes);
 }
 function renderBatchSummary(stoppedEarly) {
+	renderBatchPreview();
 	var succeeded = batchRows.filter(row => row.status === 'success').length;
 	var failed = batchRows.filter(row => row.status === 'error');
 	var notRun = batchRows.filter(row => row.status === 'pending' && row.cardname && row.presetValid && row.artFlagValid).length;
@@ -718,9 +719,10 @@ function renderBatchSummary(stoppedEarly) {
 	}
 	summary.innerHTML = html;
 	summary.classList.remove('hidden');
-	renderBatchPreview();
 }
 ```
+
+(`renderBatchPreview()` moved to the *first* line — calling it last would immediately re-hide `#batch-summary`, since `renderBatchPreview()`'s own last statement is `document.querySelector('#batch-summary').classList.add('hidden');`. Caught during Task 9 implementation via an isolated Node-harness test of the extracted function bytes.)
 
 `renderBatchPreview()` (Task 7) is called from inside `runBatchRow`/`renderBatchSummary`, so Status cells and the Retry button per row stay in sync automatically — no separate DOM-patching path to keep in sync.
 
