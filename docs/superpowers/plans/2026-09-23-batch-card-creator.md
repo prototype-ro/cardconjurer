@@ -237,12 +237,12 @@ Replace with:
 
 ```js
 async function applyFramePreset(presetName) {
-	if (!presetName) {return;}
+	if (!presetName) {return false;}
 	try {
 		var preset = await cardDB.get(presetName, 'framePresets');
 		if (!preset) {
 			notify(presetName + ' failed to load.', 5);
-			return;
+			return false;
 		}
 		// replay Frame Group + Pack + "Load Frame Version", if saved (older presets won't have these fields — skip this phase for them)
 		if (preset.frameGroup && preset.framePack) {
@@ -265,11 +265,15 @@ async function applyFramePreset(presetName) {
 			}
 		});
 		drawTextBuffer();
+		return true;
 	} catch (error) {
 		notify('Failed to apply frame preset "' + presetName + '" (' + error.message + ').');
+		return false;
 	}
 }
 ```
+
+(Note: `applyFramePreset()` now returns `true`/`false` to signal success — added later, in the batch-runner follow-up fix, so `runBatchRow()` can detect a failed preset apply instead of silently proceeding. The existing manual Frame-tab call site, `onchange='applyFramePreset(this.value)'`, ignores the return value and is unaffected.)
 
 - [ ] **Step 2: Manual verification**
 
