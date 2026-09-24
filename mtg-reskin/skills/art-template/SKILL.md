@@ -2,7 +2,7 @@
 
 This is the shared base every card-type skill (`creature`, `artifact`, `instant`, `sorcery`, `enchantment`, `land`, `planeswalker`, `battle`) is built on. It encodes the rules that keep all cards in a themed deck reading as one coherent, professionally-art-directed set instead of eight unrelated AI-fantasy generators. **Do not duplicate these rules inside a type skill.** A type skill should reference this file by name and add only its own compositional-mode taxonomy (the type-specific "what kind of shot is this" step) plus any per-type defaults — everything below is shared and applies unmodified to every card, regardless of type.
 
-These rules are derived from Rodrigo's corpus of 24 proven Midjourney prompts (`reference/user-prompts.md`), not invented from scratch — when in doubt, they are ground truth over general prompt-engineering intuition.
+These rules are derived from Rodrigo's corpus of 21 proven Midjourney prompts (`reference/user-prompts.md`), not invented from scratch — when in doubt, they are ground truth over general prompt-engineering intuition.
 
 ## 1. Who/What/Why/Where brief
 
