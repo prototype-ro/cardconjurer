@@ -4915,7 +4915,7 @@ function importCardByNameAsync(cardName, setCode, collectorNumber, timeoutMs = 8
 				changeCardIndex();
 			}
 			resolve();
-		}, '');
+		}, setCode ? 'prints' : '');
 	});
 }
 function waitForArtOrReset(artFlag) {
@@ -4958,8 +4958,13 @@ async function runBatchRow(index) {
 			(row.setCode ? ' (' + row.setCode.toUpperCase() +
 				(row.collectorNumber ? ' #' + row.collectorNumber.trim() : '') +
 			')' : '');
+		// Space out the 3 downloads: firing them back-to-back in one tick is
+		// exactly the pattern browsers (esp. Safari) throttle/silently drop
+		// as "multiple automatic downloads" without a fresh user gesture.
 		exportVariant(false, false, '', batchNameBase);
+		await new Promise(r => setTimeout(r, 500));
 		exportVariant(true, false, '-frame', batchNameBase);
+		await new Promise(r => setTimeout(r, 500));
 		exportVariant(true, true, '-textonly', batchNameBase);
 		row.status = 'success';
 	} catch (error) {
