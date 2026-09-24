@@ -1,0 +1,115 @@
+> Built on skills/art-template/SKILL.md.
+
+This file adds enchantment-specific art direction on top of the shared rules in `art-template/SKILL.md` (diegetic lighting, palette discipline, intricacy, framing, banned words, closing suffix, etc. — all apply unmodified). It does not repeat those rules.
+
+Enchantments split cleanly by **subtype** rather than role (unlike instants/sorceries): Aura, Saga, Curse, Class, Room, and a catch-all for global/world-altering enchantments with no subtype. Each subtype gets its own decisive-moment convention, because the mechanical shape of the card — attached to something, unfolding over chapters, cursing a player, leveling up, split into two rooms, or just sitting on the battlefield warping the whole game — genuinely changes what the art should depict.
+
+This is a **reduced-depth sample**, per the design spec's cost trade-off for non-creature types: one Scryfall query per subtype (`t:aura`, `t:saga`, `t:curse`, `t:class`, `t:room`, `t:shrine`, and a general `t:enchantment -t:aura -t:saga -t:curse -t:class -t:room` pass for global enchantments), each `year>=2010 -is:digital -is:promo`, `unique=art&order=usd&dir=desc`, roughly 8-10 unique cards read per subtype. A representative subset was actually viewed in full — 26 images across all seven queries (the "Shrine" query is folded into the global-enchantment writeup below rather than kept separate; see that section for why) — sufficient at this depth to ground the conventions below, not an exhaustive grid.
+
+**Universes Beyond / crossover exclusions caught mid-sampling, verified by set code:** in the Saga query — Sheoldred // The True Scriptures, Urabrask // The Great Work, Elesh Norn // The Argent Etchings (set `mom` — these are legitimate original-Magic "compleated planeswalker" split-Saga cards, *not* excluded, despite the unusual format); The City on the Edge of Forever (Star Trek, set `trk`); Summon: Primal Odin, Summon: Knights of Round, Summon: Yojimbo, Clive Ifrit's Dominant // Ifrit Warden of Inferno, Terra Magical Adept // Esper Terra (Final Fantasy, sets `fin`/`fic`); The Rise of Sozin // Fire Lord Sozin, The Legend of Roku // Avatar Roku (Avatar: The Last Airbender, set `tla`); Birth of the Imperium, The Horus Heresy (Warhammer 40K, set `40k`) — all excluded. In the global-enchantment query, two "Enchanting Tales" masterpiece-frame arts (set `wot`, a legitimate Magic set but this particular alternate-art treatment leans into full pop-culture homage/parody rather than the corpus's painterly style — Smothering Tithe's alt art is a direct Mr. Krabs likeness, Rhystic Study's is an anime mermaid) were swapped for the same cards' standard-frame printings instead of being used as worked examples. Also in the aura and global queries, several Secret Lair (`sld`) alternate arts came up as top price hits (an Iron Maiden album-cover crossover for Animate Dead, a cartoon-mouse illustration for Curiosity) — these were skipped in favor of the cards' mainline-set art, since Secret Lair alt-art style is a deliberate stylistic departure from the corpus's painterly-fantasy register, not a representative sample of it.
+
+**Not every subtype/color cell is evenly populated**, and this file doesn't force it — see the per-subtype notes below for where the sample was thin.
+
+## Contents
+
+**Subtypes:** [Aura](#aura) · [Saga](#saga) · [Curse](#curse) · [Class](#class) · [Room](#room) · [Global / World-Altering Enchantments](#global--world-altering-enchantments)
+
+---
+
+## Aura
+
+**Decisive moment:** the instant the Aura takes hold on its subject — not the subject at rest before, not a static "already-bound" pose. Show the binding, the corruption, the blessing, or the leash actually settling onto or into the subject, with visible evidence that the subject's own state has just changed as a direct result. Since an Aura is a card in its own right and Auras are frequently reprinted with new art independent of the creature that happens to enchant them at any given table, do not assume a specific creature identity — depict the *effect* taking hold on a generic, unnamed subject (a hand, a silhouette, a nameless soldier) rather than trying to illustrate a particular named creature.
+
+**Per-color notes:**
+- **Black** (reanimation / cost-bearing binding — based on Animate Dead): the bound dead rise as translucent, unfinished figures still caught mid-transition — pale smoke-edged silhouettes against a saturated red or black backdrop, not solid rebuilt bodies. Where the Aura carries a cost (life loss, sacrifice), stage that cost visibly per the shared Removal convention in `instant/SKILL.md`.
+- **Blue** (mind control / redirection — based on Threads of Disloyalty): the subject's eyes or posture read as *not their own* — a glassy, faraway stare, or a body moving toward the caster's will rather than its own, cool blue-white light marking the point of intrusion.
+- **Red** (battle-fury / forced aggression — based on Breath of Fury): a visible flame or heat-shimmer crowning the subject's head or weapon arm exactly at the moment of the aggression spike, expression contorted past the subject's normal composure.
+- **Green** (unusual at instant-speed-style Auras; this sample's green hits, e.g. Lure, skewed toward object-based rather than creature-based staging and didn't yield a clean per-color convention) — fall back on the shared decisive-moment description above rather than forcing a green-specific register at this depth.
+
+**Worked examples:**
+1. *(Black, based on Animate Dead.)* A translucent, smoke-white skeletal figure is mid-rise from broken ground, its edges still dissolving into vapor rather than holding a solid outline, saturated crimson light throwing its ribs into sharp silhouette from behind — caught the instant it crosses from corpse to creature, not yet fully arrived on either side.
+2. *(Blue, based on Threads of Disloyalty.)* A robed figure strides forward flanked by rank on rank of hollow-eyed followers whose irises have gone the same cold blue-white as the binding light gathered at the figure's collarbone, one hand raised in command that isn't quite the figure's own gesture.
+3. *(Red, based on Breath of Fury.)* A soldier's helm-crest ignites into a crown of red flame at the exact moment their war-cry begins, the fire's heat-shimmer already spreading toward the ranks just behind, no visible torch or source other than the soldier's own sudden fury.
+
+---
+
+## Saga
+
+**Decisive moment:** a Saga tells its story across chapters, so a single frozen instant doesn't fully honor the card. Default to describing the *published card art's* single chosen vignette (most Sagas ship with one continuous piece of art, not a per-chapter comic strip) — pick the single most visually decisive beat among the chapters, usually the climax (the final chapter) or the most visually dramatic turn, and stage that. Note this may need 2-3 chapter beats described separately when the prompt is meant to accompany a Saga whose story genuinely spans a "before/during/after" arc that can't be compressed into one frozen moment without losing the read — in that case, describe each beat as a short separate clause within the same prompt (same setting, same light source, escalating state) rather than three unrelated images.
+
+**Per-color notes:**
+- **Red** (a bargain or a spark that escalates — based on Fable of the Mirror-Breaker): stage the chapter where the small, cheap-looking effect (a token, a goblin, a coin) is revealed to be the seed of something much larger — a single flame or ember in frame that the rest of the composition visibly builds toward or away from.
+- **Black** (a cost extracted in stages — based on The Cruelty of Gix): a single towering, skeletal or armored antagonist figure presiding over the scene, with a smaller supplicant or victim figure positioned below/around them to mark the escalating price being paid across the chapters.
+
+Green, white, and blue Sagas were thin in this pass — the sample skewed heavily toward Kamigawa/Dominaria-era black and red — so this file doesn't offer a per-color convention for those three colors at this depth; fall back on the shared decisive-moment description above.
+
+**Worked examples:**
+1. *(Red, based on Fable of the Mirror-Breaker.)* A grinning goblin shaman crouches over a single glinting coin balanced on a stone ledge, the coin's dim glow the only light source in an otherwise dark forge — the moment framed so the coin's small light is clearly the spark that everything larger in the room owes its fire to.
+2. *(Black, based on The Cruelty of Gix.)* A towering, ribbed silver-and-bone figure looms at the center of a ruined shrine, one hand raised in judgment as a smaller robed supplicant is caught mid-fall backward from the figure's presence, cold blue starlight from cut gems embedded in the tall figure's chest the only light breaking the surrounding dark stone.
+3. *(Multi-beat example, hypothetical deck Saga.)* Chapter beat one: a single candle is lit in an empty stone hall, warm light barely reaching the walls; chapter beat two, same hall, same candle now guttering low as shadow-shapes gather at the light's furthest edge; chapter beat three, same hall, the candle extinguished and the shadow-shapes now standing fully lit by a colder light of their own — describe all three within one prompt as sequential clauses sharing the same set and light source, so the escalation reads as one continuous scene rather than three unrelated images.
+
+---
+
+## Curse
+
+**Decisive moment:** the affliction actively taking hold on its target — not a Curse sitting inert on the battlefield, and not the target already fully consumed. Curses enchant a *player*, not a creature or object, so the target is usually depicted as a ruler, a crowd, or an environment standing in for that player, with the Curse's effect visibly closing in on or already disfiguring that stand-in.
+
+**Per-color notes:**
+- **Black** (a death sentence made visible — based on Curse of Vengeance): a single sharp, glowing weapon-shape hovers threateningly above a seated or otherwise vulnerable figure who hasn't yet reacted, the weapon's light the only unnatural element in an otherwise mundane scene — the dread comes from the target's stillness against the obvious coming violence.
+- **Red** (chaos/frenzy erupting around the target — based on Maddening Hex): a frantic, off-balance figure surrounded by a swarming, snarling horde that seems to be closing in from every side at once, no single clean light source but a chaotic wash of firelight suggesting the scene could tip into violence from any direction.
+- **White** (a Curse that reshapes the world around the target rather than attacking them directly — based on Overwhelming Splendor): stage the environment itself visibly transforming into something opulent, alien, or otherwise no-longer-the-target's-own — a bridge of black horn-like structures framing a burning gem of light — the target's absence from the frame itself is the point: the world has already been remade around them.
+
+Green and blue Curses were essentially absent from this sample (Curse is heavily black/red-coded, with white's rarer entries leaning toward the environmental-transformation register above) — this file doesn't offer green or blue conventions for Curse at this depth.
+
+**Worked examples:**
+1. *(Black, based on Curse of Vengeance.)* A crowned figure sits alone on a shadowed dais lit only by a single hard shaft of pale light from above, a glowing crimson blade hovering point-down just above the figure's head, the figure's own posture slack and unaware of the threat suspended inches away.
+2. *(Red, based on Maddening Hex.)* A wild-eyed figure stumbles backward through a firelit ruin as snarling, fanged shapes press in from both sides and overhead at once, no single source of light but the orange glow of the ruin itself throwing every shadow in a different, disorienting direction.
+3. *(White, based on Overwhelming Splendor.)* Two curling black horn-like spires frame a small, brilliant burning gem of light hovering between them above a barren frozen bridge, the whole scene reading as a throne room built for something that doesn't belong to the world below it — no figure present, the transformed setting itself standing in for the cursed player's absence.
+
+---
+
+## Class
+
+**Decisive moment:** the instant of leveling up — a character's gear, stance, or magic visibly stepping up in power or complexity from a rougher starting point, caught at the moment the upgrade completes rather than before or well after. Class cards are single-character progression tracks (fighter, wizard, rogue, etc. gaining abilities as you pay to level them), so unlike Room below, this is a *character* convention, not a spatial/structural one — the plan's grouping of Class and Room together doesn't hold up under sampling: Class art in this sample split between iconographic close-ups of gear/emblems (Fighter Class, Wizard Class) and full-scene character portraits (Innkeeper's Talent, a Class-subtype "Talent" variant introduced in Bloomburrow), but both registers are about a single character's escalating mastery, never about two adjoining physical spaces the way Room is. They're documented as separate sub-parts below rather than forced into one shared write-up.
+
+**Per-color notes:**
+- **Multicolor / white-red (equipment-focused — based on Fighter Class):** a gauntleted hand tightening its grip on an emblem or weapon-head that's visibly more ornate or battle-worn than a starting piece of gear would be — the upgrade reads through the object's craftsmanship, not the character's face.
+- **Blue (spell-focused — based on Wizard Class):** an open hand beneath a swirling arcane glyph that's visibly more complex or brighter than a first-level cantrip would produce — the glyph itself is the "level," rendered with more intricate linework than a basic spell-effect would need.
+- **Green (growth-focused — based on Innkeeper's Talent):** a full character portrait in a lived-in environment (a shop counter, a hearth) with visible tools/goods of the character's trade arrayed around them — the "level up" reads as the character being shown fully in their element rather than a close-up gear shot.
+
+**Worked examples:**
+1. *(Red-white, based on Fighter Class.)* An armored gauntlet closes around a heraldic emblem-head still catching the last of a torch's warm light, fresh scratches and a single deep dent visible across its face — the wear itself is the tell that this is a veteran's gear, not a recruit's.
+2. *(Blue, based on Wizard Class.)* An open, upturned palm sits beneath a tight spiral of cyan-white arcane light, three small motes of light orbiting the spiral's outer edge like a signature the caster has only recently learned to add.
+3. *(Green, based on Innkeeper's Talent.)* A stout, spectacled shopkeeper stands behind a cluttered counter of jars and dried herbs, one hand raised mid-gesture toward a customer just outside the frame, warm lantern-light catching the counter's well-worn grain and the goods stacked in practiced, unglamorous rows.
+
+---
+
+## Room
+
+**Decisive moment:** Room enchantments are physically split into two adjoining door-halves (you may unlock either or both), and the sampled art consistently renders this as a genuine **two-panel composition** — two distinct but visually connected spaces divided by a hard vertical seam down the middle of the frame, each half staged with its own distinct lighting/color register while something (a color bleed, a crack, a shared structural element) crosses the seam to mark the two rooms as part of the same building. This is a structural/spatial convention, not a character one, and is meaningfully different from Class above — hence the split write-up.
+
+**Per-color note:** sampled almost entirely from Duskmourn (the set that introduced Room), so per-color staging beyond "each half's own light register" wasn't distinguishable within a single set's shared visual identity at this sample depth — treat the two-panel structure itself as the load-bearing convention regardless of color, and let the palette (Rule 4) carry the color identity within each half.
+
+**Worked examples:**
+1. *(Black, based on Funeral Room // Awakening Hall.)* Left half: a closed coffin under a torn velvet canopy, pale flowering vines creeping across its lid in cool blue-grey light. Right half, across a hard vertical seam: the same vines continuing unbroken into a darker second chamber where a robed, skeletal shape sits half-risen from a bench, the vines' pale flowers now the only light source in that half's near-total dark — one continuous plant motif crossing the seam is what ties the two halves to the same building.
+2. *(White, based on Dollmaker's Shop // Porcelain Gallery.)* Left half: a cluttered workshop lit by hanging lantern-light, half-finished porcelain figures lining shelves in warm amber tones. Right half: the same shelving continuing into a colder, over-lit gallery where the finished dolls stand in uncanny too-perfect rows, the seam between the two halves marked by a single shelf that visibly continues from one lighting register into the other.
+
+---
+
+## Global / World-Altering Enchantments
+
+**Decisive moment:** these enchantments do nothing when they enter beyond sitting on the battlefield and quietly rewriting a rule of the game for as long as they last — the art convention responds to that by staging a wide, world-scale shot of the rule already being visibly true, rather than a caster or a moment of casting. This section also folds in the Shrine query results: Shrines (a cycle of small colored God-relic enchantments) sampled as either a single glowing artifact-statue in a wide landscape or, in one modern-frame example (Go-Shintai of Life's Origin), a busy iconographic scene — both registers are just specific instances of this same "world already reflects the enchantment's rule" convention rather than needing their own separate write-up, which is why Shrine isn't broken out as its own subtype heading.
+
+**Per-color notes:**
+- **White** (an imposed order or toll — based on Smothering Tithe, Ghostly Prison): a wide shot of a single figure caught mid-reaction to a rule that's already inescapably in effect — coins spilling from open hands they can't stop, a barred gate they can't pass — the "law" reads as already-total, not something being cast.
+- **Blue** (an ongoing drain or unlocked ceiling — based on Rhystic Study, Omniscience): two or more figures mid-spellwork surrounded by a visibly excessive quantity of the same glowing resource (cards, motes, gems) far beyond what a normal single spell would produce — the excess itself is the tell that a standing rule, not a one-time burst, is in effect.
+- **Red** (a landscape already remade — based on Blood Moon): a wide establishing shot of towers or spires that have visibly stopped being what they were — the same silhouette now catching a color of light and material that doesn't belong to their original type — with no caster present, because the transformation is a standing condition, not an event.
+- **Black** (a throne or army already assembled and waiting — based on No Mercy, Sanctum of Stone Fangs): a wide, symmetrical shot of a fortified structure or ranked host already in position, lit by a single hard source from behind/above, the composition reading as "this has always been here and is not going anywhere" rather than a moment of arrival.
+- **Green** (an ongoing multiplication or overgrowth — based on Doubling Season, Honden of Life's Web): a wide shot where a natural process (growth rings, spreading roots, duplicating shapes) is caught having clearly run further than it naturally should, the excess reading as a standing rule rather than a single burst of magic.
+
+**Worked examples:**
+1. *(White, based on Smothering Tithe.)* A hunched, wild-eyed figure in a rain-slicked city street claws at a torrent of gold coins pouring from their own overfull hands and pockets, unable to stop the flow, cathedral spires receding into grey mist behind them — the coin-flood reads as constant and inescapable, not a single spell's burst.
+2. *(Blue, based on Rhystic Study.)* Two robed figures kneel over a cluttered desk as a small storm of glowing white gem-shapes and burning motes erupts between them, far more light and matter than either figure's raised hands alone could be casting — the sheer excess of glowing shapes is what marks this as an ongoing drain rather than a single spell resolving.
+3. *(Red, based on Blood Moon.)* A wide desert horizon lined with tall stone spires that have visibly gone the color and texture of scorched red rock rather than their original pale stone, a single blood-colored moon hanging directly above the tallest spire, no figure or caster present — the transformed silhouettes are the entire subject.
+4. *(Black, based on No Mercy.)* A perfectly symmetrical host of identical bone-armored soldiers stands ranked on wide stone stairs leading up to twin curved black spires, a hard golden backlight throwing the entire front rank into near-silhouette, the sheer uniform scale of the host reading as a standing, ever-present guard rather than an army caught mid-muster.
+5. *(Green, based on Doubling Season.)* A single sapling's growth-rings are visible through a cutaway in its bark, but the rings multiply and split into pairs at an unnatural rate as they near the bark's surface, moss-green light glowing faintly from within the densest cluster of rings — the doubling itself, not a caster, is the entire visual subject.
