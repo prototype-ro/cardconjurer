@@ -3148,12 +3148,12 @@ async function loadAvailableFramePresets() {
 	}
 }
 async function applyFramePreset(presetName) {
-	if (!presetName) {return;}
+	if (!presetName) {return false;}
 	try {
 		var preset = await cardDB.get(presetName, 'framePresets');
 		if (!preset) {
 			notify(presetName + ' failed to load.', 5);
-			return;
+			return false;
 		}
 		// replay Frame Group + Pack + "Load Frame Version", if saved (older presets won't have these fields — skip this phase for them)
 		if (preset.frameGroup && preset.framePack) {
@@ -3186,8 +3186,10 @@ async function applyFramePreset(presetName) {
 			}
 		});
 		drawTextBuffer();
+		return true;
 	} catch (error) {
 		notify('Failed to apply frame preset "' + presetName + '" (' + error.message + ').');
+		return false;
 	}
 }
 async function deleteFramePreset() {
@@ -4942,7 +4944,10 @@ async function runBatchRow(index) {
 	row.reason = '';
 	renderBatchPreview();
 	try {
-		await applyFramePreset(row.presetName);
+		var presetApplied = await applyFramePreset(row.presetName);
+		if (!presetApplied) {
+			throw new Error('frame preset "' + row.presetName + '" failed to apply');
+		}
 		await importCardByNameAsync(row.cardname, row.setCode, row.collectorNumber);
 		await waitForArtOrReset(row.artFlag);
 		if (row.nickname && card.text.nickname) {
@@ -4971,6 +4976,7 @@ async function runBatch(indexesOverride) {
 	batchRunning = true;
 	batchCancelled = false;
 	document.querySelector('#batch-run').disabled = true;
+	document.querySelector('#batch-parse').disabled = true;
 	document.querySelector('#batch-stop').classList.remove('hidden');
 	document.querySelector('#batch-progress').classList.remove('hidden');
 	document.querySelector('#batch-summary').classList.add('hidden');
@@ -4993,6 +4999,7 @@ async function runBatch(indexesOverride) {
 	}
 	batchRunning = false;
 	document.querySelector('#batch-run').disabled = false;
+	document.querySelector('#batch-parse').disabled = false;
 	document.querySelector('#batch-stop').classList.add('hidden');
 	document.querySelector('#batch-progress').classList.add('hidden');
 	renderBatchSummary(stoppedEarly);
@@ -5014,7 +5021,7 @@ async function runRemainingBatchRows() {
 	await runBatch(indexes);
 }
 function renderBatchSummary(stoppedEarly) {
-	renderBatchPreview();
+	renderBatchPreview(); // must run before summary.innerHTML/classList below — renderBatchPreview() itself re-hides #batch-summary at its own end, so calling it after would immediately hide what we're about to show
 	var succeeded = batchRows.filter(row => row.status === 'success').length;
 	var failed = batchRows.filter(row => row.status === 'error');
 	var notRun = batchRows.filter(row => row.status === 'pending' && row.cardname && row.presetValid && row.artFlagValid).length;
