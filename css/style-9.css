@@ -296,6 +296,9 @@ a.underline {
 .hidden {
 	display: none;
 }
+.batch-row-invalid {
+	color: #ff6b6b;
+}
 .fake-hidden {
 	opacity: 0;
 	position: absolute;

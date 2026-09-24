@@ -105,6 +105,7 @@
 					<h3 class='selectable readable-background' onclick='toggleCreatorTabs(event, "bottomInfo")'>Collector</h3>
 					<h3 class='selectable readable-background' onclick='toggleCreatorTabs(event, "import")'>Import/Save</h3>
 					<h3 class='selectable readable-background' onclick='toggleCreatorTabs(event, "export")'>Export</h3>
+					<h3 class='selectable readable-background' onclick='toggleCreatorTabs(event, "batch")'>Batch</h3>
 					<h3 class='selectable readable-background' onclick='toggleCreatorTabs(event, "tutorial"); loadTutorialVideo();'>Tutorial</h3>
 				</div>
 				<div id='creator-menu-sections' class='margin-bottom'>
@@ -711,6 +712,30 @@
 							<h5 class='margin-bottom padding input-description'>Export text and set symbol only (no frame, no art) as a transparent PNG</h5>
 							<button class='input' onclick='exportTextOnly();'>Export Text + Symbol Only</button>
 						</div>
+					</div>
+					<div id='creator-menu-batch' class='hidden'>
+						<div class='readable-background margin-bottom padding'>
+							<h5 class='margin-bottom padding input-description'>One card per line: Cardname | SetCode | CollectorNumber | Nickname | FramePresetName | art-flag<br>SetCode, CollectorNumber, and Nickname may be left blank. art-flag must be exactly "art" or "no-art".<br>Example: Lightning Bolt | | | | MyRedPreset | art</h5>
+							<textarea id='batch-input' class='input margin-bottom' rows='8' placeholder='Lightning Bolt | | | | MyRedPreset | art'></textarea>
+							<button id='batch-parse' class='input' onclick='parseBatchInput();'>Parse</button>
+						</div>
+						<div class='readable-background margin-bottom padding'>
+							<h5 class='padding margin-bottom input-description'>Save the current list</h5>
+							<button class='input margin-bottom' onclick='saveBatchList();'>Save Batch List</button>
+							<h5 class='padding margin-bottom input-description'>Load a saved list</h5>
+							<select id='load-batch-list-options' class='input margin-bottom' onchange='loadBatchList(this.value);'></select>
+							<h5 class='padding margin-bottom input-description'>Delete selected list</h5>
+							<button class='input' onclick='deleteBatchList();'>Delete Batch List</button>
+						</div>
+						<div id='batch-preview' class='readable-background margin-bottom padding hidden'>
+							<div id='batch-preview-rows'></div>
+							<div class='padding input-grid'>
+								<button id='batch-run' class='input' onclick='runBatch();' disabled>Run Batch</button>
+								<button id='batch-stop' class='input hidden' onclick='stopBatch();'>Stop</button>
+							</div>
+							<h5 id='batch-progress' class='padding input-description hidden'></h5>
+						</div>
+						<div id='batch-summary' class='readable-background margin-bottom padding hidden'></div>
 					</div>
 					<div id='creator-menu-tutorial' class='hidden'>
 						<!-- <div class='padding readable-background margin-bottom'>
