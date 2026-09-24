@@ -5010,8 +5010,10 @@ function stopBatch() {
 async function retryBatchRow(index) {
 	if (batchRunning) {return;}
 	batchRunning = true;
+	document.querySelector('#batch-parse').disabled = true;
 	await runBatchRow(index);
 	batchRunning = false;
+	document.querySelector('#batch-parse').disabled = false;
 	renderBatchSummary(false);
 }
 async function runRemainingBatchRows() {
