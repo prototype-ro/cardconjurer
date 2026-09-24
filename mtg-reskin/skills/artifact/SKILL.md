@@ -37,7 +37,7 @@ A color-shift or a single glow is not depth. Give the object visible history: en
 
 A printed full-art card's title bar covers roughly the top 10-15% of the image and the text box covers roughly the bottom 35-40%. The actual visible "art window" is the middle band — roughly 20% to 65% down from the top. State this explicitly and with real percentages in every prompt:
 
-> "composition composed so the [subject/most detailed part] sits within the vertical middle band of the frame, roughly between 20% and 65% down from the top, well clear of both the top 15% and the bottom 35% of the image... [upper area] fading into plain dark atmosphere — expendable space meant to be cropped by the title bar, [lower area] fading into shadow — expendable space meant to be cropped by the text box"
+> "composition composed so the [subject/most detailed part] sits within the vertical middle band of the frame, roughly between 20% and 65% down from the top, well clear of both the top 15% and bottom 35% of the image — [upper area] fading into plain dark atmosphere, expendable space meant to be cropped by the title bar; [lower area] fading into shadow, expendable space meant to be cropped by the text box."
 
 Just saying "kept clear of the top/bottom edge" is not enough — it tells the model what to avoid, not where the composition's actual weight should concentrate.
 
