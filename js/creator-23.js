@@ -4936,6 +4936,99 @@ function waitForArtOrReset(artFlag) {
 		}, pollInterval);
 	});
 }
+async function runBatchRow(index) {
+	var row = batchRows[index];
+	row.status = 'running';
+	row.reason = '';
+	renderBatchPreview();
+	try {
+		await applyFramePreset(row.presetName);
+		await importCardByNameAsync(row.cardname, row.setCode, row.collectorNumber);
+		await waitForArtOrReset(row.artFlag);
+		if (row.nickname) {
+			card.text.nickname.text = row.nickname;
+			textEdited();
+		}
+		var batchNameBase = getCardName() +
+			(row.setCode ? ' (' + row.setCode.toUpperCase() +
+				(row.collectorNumber ? ' #' + row.collectorNumber.trim() : '') +
+			')' : '');
+		exportVariant(false, false, '', batchNameBase);
+		exportVariant(true, false, '-frame', batchNameBase);
+		exportVariant(true, true, '-textonly', batchNameBase);
+		row.status = 'success';
+	} catch (error) {
+		row.status = 'error';
+		row.reason = error.message;
+		notify('Batch row "' + row.cardname + '" failed: ' + error.message, 5);
+	}
+	renderBatchPreview();
+}
+var batchCancelled = false;
+var batchRunning = false;
+async function runBatch(indexesOverride) {
+	if (batchRunning) {return;}
+	batchRunning = true;
+	batchCancelled = false;
+	document.querySelector('#batch-run').disabled = true;
+	document.querySelector('#batch-stop').classList.remove('hidden');
+	document.querySelector('#batch-progress').classList.remove('hidden');
+	document.querySelector('#batch-summary').classList.add('hidden');
+	var indexes = indexesOverride || batchRows
+		.map((row, index) => index)
+		.filter(index => {
+			var row = batchRows[index];
+			return row.cardname && row.presetValid && row.artFlagValid;
+		});
+	var stoppedEarly = false;
+	for (var i = 0; i < indexes.length; i++) {
+		var index = indexes[i];
+		document.querySelector('#batch-progress').innerHTML = 'Processing ' + (i + 1) + ' / ' + indexes.length + ': ' + batchRows[index].cardname + '...';
+		await runBatchRow(index);
+		await new Promise(r => setTimeout(r, 800));
+		if (batchCancelled) {
+			stoppedEarly = true;
+			break;
+		}
+	}
+	batchRunning = false;
+	document.querySelector('#batch-run').disabled = false;
+	document.querySelector('#batch-stop').classList.add('hidden');
+	document.querySelector('#batch-progress').classList.add('hidden');
+	renderBatchSummary(stoppedEarly);
+}
+function stopBatch() {
+	batchCancelled = true;
+}
+async function retryBatchRow(index) {
+	if (batchRunning) {return;}
+	batchRunning = true;
+	await runBatchRow(index);
+	batchRunning = false;
+	renderBatchSummary(false);
+}
+async function runRemainingBatchRows() {
+	var indexes = batchRows
+		.map((row, index) => index)
+		.filter(index => batchRows[index].status !== 'success' && batchRows[index].cardname && batchRows[index].presetValid && batchRows[index].artFlagValid);
+	await runBatch(indexes);
+}
+function renderBatchSummary(stoppedEarly) {
+	var succeeded = batchRows.filter(row => row.status === 'success').length;
+	var failed = batchRows.filter(row => row.status === 'error');
+	var notRun = batchRows.filter(row => row.status === 'pending' && row.cardname && row.presetValid && row.artFlagValid).length;
+	var summary = document.querySelector('#batch-summary');
+	var html = '<h5 class="padding input-description">' + succeeded + ' succeeded, ' + failed.length + ' failed' + (notRun ? ', ' + notRun + ' not yet run' : '') + (stoppedEarly ? ' (stopped)' : '') + '</h5>';
+	if (failed.length) {
+		html += '<h5 class="padding input-description">Failed: ' + failed.map(row => row.cardname + ' (' + row.reason + ')').join(', ') + '</h5>';
+	}
+	if (failed.length || notRun) {
+		html += '<button class="input" onclick="runRemainingBatchRows();">Run Remaining</button>';
+	}
+	summary.innerHTML = html;
+	summary.classList.remove('hidden');
+	renderBatchPreview();
+}
 //IMPORT/SAVE TAB
 function importCard(cardObject) {
 	scryfallCard = cardObject;
