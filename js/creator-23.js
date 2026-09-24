@@ -4933,6 +4933,16 @@ function waitForArtOrReset(artFlag) {
 			elapsed += pollInterval;
 			if (card.artSource !== previousArtSource || elapsed >= timeoutMs) {
 				clearInterval(poll);
+				// When a specific print is pinned, changeCardIndex() fires twice
+				// (once via importCard()'s own internal call, once via our
+				// correction), each kicking off its own async art fetch for the
+				// same card name/URL. Reassigning art.src to an unchanged value
+				// can skip firing a fresh load event, so the one-shot autoFitArt()
+				// installed by uploadArt(src, 'autoFit') doesn't always run.
+				// Re-run it here, defensively and idempotently, once art is loaded.
+				if (art.complete && card.artBounds) {
+					autoFitArt();
+				}
 				resolve();
 			}
 		}, pollInterval);
