@@ -446,8 +446,9 @@ For each valid row, in order:
   still-running main batch (both buttons are disabled while
   `batchCancelled === false` and a run is actively in progress).
 
-### Known limitation (documented, not solved by this spec)
+### Known limitations (documented, not solved by this spec)
 
+**1. Stale art fetch overwriting a `no-art` reset.**
 For `no-art` rows, if the previous row's Scryfall art fetch is still
 in flight when `uploadArt(blank)` runs, that stale fetch can complete
 moments later and silently replace the blank art before export
@@ -458,6 +459,30 @@ scope here). Mitigation: the 800ms inter-row delay (step 6) gives
 the previous row's fetch time to settle before the next row starts,
 which in practice is enough since art crops are small images on a
 CDN; this is a heuristic, not a guarantee.
+
+**2. Art-wait polling can't detect "art didn't change."**
+`waitForArtOrReset` detects art arrival by polling for `card.artSource`
+to differ from its pre-import value. Different prints of the same card
+frequently share an identical `art_crop` URL (showcase/borderless
+variants, many reprints), and a row may legitimately resolve to the
+same art as the previous row. In those cases `card.artSource` never
+changes, so the poll burns its full 6-second timeout before
+proceeding. The row still exports correctly — the art present is the
+right art — it's purely a latency cost (up to 6s on affected rows),
+not a correctness problem. Detecting this properly would require
+hooking `art.onload`/`artEdited`, which this spec deliberately avoids
+touching (shared, heavily-used code).
+
+**3. Art-wait snapshot timing relies on network latency.**
+`waitForArtOrReset` snapshots `previousArtSource` *after*
+`importCardByNameAsync` resolves, by which point `changeCardIndex()`
+has already kicked off the art XHR. This is safe only because a real
+network round-trip reliably outlasts the microtask tick between those
+two steps. It holds for real Scryfall traffic but is an assumption,
+not an assertion — a pathologically fast (e.g. fully cached) art
+response could in principle land before the snapshot, causing that
+row to wait out the 6s timeout as in limitation 2 above. Same
+consequence: latency, not incorrectness.
 
 ## Testing
 
