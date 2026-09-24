@@ -60,6 +60,8 @@ Fixes, apply together when a large single-blade weapon is the focal object:
 - **Give the blade a resting point or clear termination** (point driven into the ground, point held level, tip resting on a shoulder) rather than letting it run off the bottom of the frame — an ambiguous, cropped blade base is a second place the shape can fall apart.
 - **Break bilateral symmetry** if the weapon is held centrally in an otherwise symmetrical pose (e.g. wings spread evenly on both sides) — angle the blade a few degrees off the body's centerline, or offset it against one side, so its edges don't visually merge with a wing or limb silhouette behind it.
 
+**Don't overcorrect into a static portrait to dodge this problem.** Dynamic mid-action poses are not the cause of weapon-geometry failures and shouldn't be abandoned for them — real published Magic art is routinely full dynamic combat, multiple things in motion at once, and reads fine. The actual failure mode is *unanchored* geometry, and separately, *conflicting* simultaneous motion (hair blown one way, wings flared another, a cloak reacting to a third implied force, with nothing tying them together). Fix dynamism by giving every moving element the same stated cause — one wind direction, one lunge/momentum vector — so hair, cloak, sash, and wings all read as reacting to the same instant, not by removing the motion.
+
 ## 8. Banned words
 
 The following words are banned as mid-scene description, anywhere in the body of the prompt: **epic, majestic, dramatic, stunning, breathtaking, mystical, ethereal, awe-inspiring**. They are empty intensifiers that give the image model no concrete visual instruction and are a strong signal of generic AI-fantasy prose.
