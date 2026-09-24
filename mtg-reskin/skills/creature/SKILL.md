@@ -4,6 +4,14 @@ This file adds creature-specific art direction on top of the shared rules in `ar
 
 Everything below is distilled from a full Scryfall sampling pass (creature art printed 2010+) — see `reference/corpus-notes.md` for the exact queries, counts, and an honest accounting of what was actually viewed vs. counted, including several cells where Universes Beyond crossover cards (Marvel, Final Fantasy, Assassin's Creed, etc.) had to be caught and discounted mid-sampling. A few cells (flagged inline below) are thin and should be treated as a starting hypothesis rather than settled house style.
 
+## Contents
+
+**Colors:** [White](#white) · [Blue](#blue) · [Black](#black) · [Red](#red) · [Green](#green) · [Multicolor](#multicolor) · [Colorless](#colorless)
+
+**Subtypes:** [Angel](#angel) · [Demon](#demon) · [Devil](#devil) · [Vampire](#vampire) · [Zombie](#zombie) · [Skeleton](#skeleton) · [Spirit](#spirit) · [Horror](#horror) · [Eldrazi](#eldrazi) · [Phyrexian](#phyrexian) · [Dragon](#dragon) · [Sphinx](#sphinx) · [Hydra](#hydra) · [Elemental](#elemental) · [Beast](#beast) · [Dinosaur](#dinosaur) · [Elf](#elf) · [Goblin](#goblin) · [Merfolk](#merfolk) · [Faerie](#faerie) · [Giant](#giant) · [Dwarf](#dwarf) · [Human — Knight](#human--knight) · [Human — Soldier](#human--soldier) · [Human — Cleric](#human--cleric) · [Human — Wizard](#human--wizard) · [Human — Rogue](#human--rogue) · [Human — Warrior](#human--warrior) · [Human — Shaman](#human--shaman) · [Human — Noble](#human--noble) · [Human — Assassin](#human--assassin) · [Construct](#construct) · [Golem](#golem) · [Insect](#insect)
+
+**Also:** [Subtype fidelity is mandatory](#subtype-fidelity-is-mandatory) · [Part 3 — Hybrid-Subtype Rule](#part-3--hybrid-subtype-rule) · [Part 4 — Compositional Modes](#part-4--compositional-modes)
+
 ## Subtype fidelity is mandatory
 
 A creature's subtype is not flavor text — it is the single most load-bearing visual instruction in the prompt. Per art-template Rule 3 (Intricacy), a generic "detailed" or "ornate" creature does not satisfy the corpus's own proven standard, and the same principle applies one level up: a generic "demon" or "angel" that could be swapped for any other demon or angel without anyone noticing has failed just as badly as a generic "ornate" object. Every creature prompt must include at least the signature features named in that subtype's section below — they are non-negotiable, not optional flourish. If a subtype's signature features are dropped in favor of generic fantasy-creature description, the prompt has not actually depicted that subtype.
@@ -14,7 +22,7 @@ A creature's subtype is not flavor text — it is the single most load-bearing v
 
 ## White
 
-**Palette:** bone-white and pale ivory armor, dried-blood crimson, gunmetal silver, warm parchment-gold trim. A cool-white figure is typically set against a hot red or ochre ground.
+**Palette menu (pick 2-3 per art-template Rule 4, not all 4):** bone-white/pale ivory armor, dried-blood crimson, gunmetal silver, warm parchment-gold trim. A cool-white figure is typically set against a hot red or ochre ground, so pairing the white/ivory base with one of crimson or gold (not both) plus silver is the usual split.
 
 **Materials/textures:** fluted bone-white plate with visible rivet seams, starched pleated linen collars, lacquered swirl-pattern cloth panels, fur-trimmed cloak collars — rigid geometric plate over soft draped cloth.
 
@@ -29,7 +37,7 @@ A creature's subtype is not flavor text — it is the single most load-bearing v
 
 ## Blue
 
-**Palette:** deep indigo/teal, cyan-white spell glow, violet-magenta swirl, gold trim as the one warm note.
+**Palette menu (pick 2-3 per art-template Rule 4, not all 4):** deep indigo/teal, cyan-white spell glow, violet-magenta swirl, gold trim as the one warm note. The indigo/teal base plus the cyan-white spell glow is the load-bearing pair; add either the violet-magenta swirl or the gold trim as the third, not both.
 
 **Materials/textures:** wet-look serpentine coils wound in gold wire, etched brass alchemical apparatus with glass vials, rune-carved helm plating, a spiraling arcane portal with a ghostly architectural silhouette inside.
 
@@ -44,7 +52,7 @@ A creature's subtype is not flavor text — it is the single most load-bearing v
 
 ## Black
 
-**Palette:** oxidized rust-red (not fire-red), near-black shadow, sickly bone-pale skin, occasional acid-green (toxic demon-flesh highlight).
+**Palette menu (pick 2-3 per art-template Rule 4, not all 4):** oxidized rust-red (not fire-red), near-black shadow, sickly bone-pale skin, occasional acid-green (toxic demon-flesh highlight). Rust-red plus near-black shadow is the constant pair; add either the bone-pale skin tone or the acid-green accent as the third, not both.
 
 **Materials/textures:** exposed ribcage-like armor fused to flesh, severed/held trophy heads, jagged bone spurs erupting through skin, chained pendant jewelry on rotted collars.
 
@@ -108,7 +116,7 @@ A creature's subtype is not flavor text — it is the single most load-bearing v
 
 ## Colorless
 
-**Palette:** brushed steel/pale platinum, aged verdigris bronze, glacier-blue ice, warm gold filigree in temple settings.
+**Palette menu (pick 2-3 per art-template Rule 4, not all 4):** brushed steel/pale platinum, aged verdigris bronze, glacier-blue ice, warm gold filigree in temple settings. These sort into two registers — cold-mechanical (steel/platinum + glacier-blue) or warm-relic (verdigris bronze + gold filigree) — pick 2-3 from within one register rather than mixing both wholesale.
 
 **Materials/textures:** articulated ball-jointed chrome limbs, engraved swirling bronze/gold filigree over a construct's hull, branching crystalline ice-spikes, riveted industrial plating streaked with corrosion.
 
@@ -156,6 +164,8 @@ A creature's subtype is not flavor text — it is the single most load-bearing v
 **Anatomy/silhouette:** small-to-human scale, slender/wiry, shown mid-gesture rather than mid-combat. Small bat-membrane wings when present. A thin prehensile tail is a recurring element.
 
 **Signature features:** (1) a close-lipped/smirking expression with arched eyebrows — clever, not feral; (2) small backswept horns high on the forehead; (3) a social/character prop (glasses, a teacup, a vest) — dressed like a character, not just a monster.
+
+**Vs. Demon: see above** — Demon's Vs. line is the reciprocal statement of this same boundary (scale and expression, not horn count).
 
 **Worked examples:**
 1. A red bespectacled devil perches on a shoulder, clawed hand cupped near an ear, tail curled around a teacup handle.
@@ -461,10 +471,9 @@ A creature's subtype is not flavor text — it is the single most load-bearing v
 
 **Vs. Human — Wizard (nearest neighbor):** Clerics in this sample are defined by intimate command over a summoned/tended monstrous being and refined dress; wizards channel through an external arcane implement and are shown mid-cast with dynamic gesture.
 
-**Worked examples (lower-confidence, thin sample):**
-1. A cleric in a floral-embroidered gown offers a small pale bloom toward a nesting shape in the dark, unseen wings shifting past the light's edge.
-2. A red-robed priestess leans against the snout of a massive chained dragon, stroking its jaw as it exhales a slow curl of smoke past her shoulder.
-3. A cleric kneels at an altar built into a dragon's ribcage, one hand pressed flat to bone gone warm with a captive light.
+**Worked examples (2 only, matching the 2-image sample — see Human-Noble/Human-Assassin for the same scaling-down pattern):**
+1. A cleric in a floral-embroidered gown offers a small pale bloom toward a nesting shape in the dark, unseen wings shifting past the light's edge. *(sourced from Shadowborn Apostle)*
+2. A red-robed priestess leans against the snout of a massive chained dragon, stroking its jaw as it exhales a slow curl of smoke past her shoulder. *(sourced from Kaalia of the Vast)*
 
 ## Human — Wizard
 
@@ -512,13 +521,13 @@ A creature's subtype is not flavor text — it is the single most load-bearing v
 
 *(LOW-CONFIDENCE, mixed signal — King T'Challa//Black Panther (Marvel) and Aragorn, the Uniter (Lord of the Rings, judgment call) excluded, leaving 2 images that pull in different directions: Kenrith, the Returned King, a classic crowned court king; and The Wandering Rescuer, a gothic sword-wielder with no crown. This section anchors on Kenrith as the stronger, more representative source.)*
 
-**Anatomy/silhouette:** upright, still, formal posture — standing on a dais in rich layered court garments, hand raised in address.
+**Anatomy/silhouette (mixed signal, anchored on Kenrith):** upright, still, formal posture — standing on a dais in rich layered court garments, hand raised in address.
 
-**Signature features:** (1) a crown or circlet as explicit rank-marker; (2) a fur-trimmed cloak or ceremonial collar with no armor plating; (3) a throne, dais, or attending retinue framing the figure as the center of an audience.
+**Signature features (mixed signal, anchored on Kenrith):** (1) a crown or circlet as explicit rank-marker; (2) a fur-trimmed cloak or ceremonial collar with no armor plating; (3) a throne, dais, or attending retinue framing the figure as the center of an audience.
 
-**Vs. Human — Knight (nearest neighbor):** Nobles wear ceremonial court dress and preside over a court with no weapon in hand; knights wear armor and are staged for combat. Note: the second remaining sample image for this cell actually falls closer to Knight/Warrior, undermining a fully clean split — treat the boundary as softer than most other subtype pairs until re-sampled.
+**Vs. Human — Knight (nearest neighbor; mixed signal):** Nobles wear ceremonial court dress and preside over a court with no weapon in hand; knights wear armor and are staged for combat. Note: the second remaining sample image for this cell actually falls closer to Knight/Warrior, undermining a fully clean split — treat the boundary as softer than most other subtype pairs until re-sampled.
 
-**Worked examples:**
+**Worked examples (2 only, matching the 2-image sample):**
 1. A crowned elder king raises a hand to silence a chamber, fur-trimmed cloak pooling over a throne carved into castle stone, a kneeling petitioner at his feet.
 2. A regent leans on his coronation staff atop a dais, robes dusty from a road he never should have had to walk himself.
 
@@ -538,7 +547,7 @@ A creature's subtype is not flavor text — it is the single most load-bearing v
 
 ## Human — Shaman
 
-*(Atla Palani, Nest Tender excluded as a Jurassic World Universes Beyond cameo; based on Meren of Clan Nel Toth, Dragon's Rage Channeler, Plaguecrafter.)*
+*(Correction: a prior research pass flagged Atla Palani, Nest Tender as a "Jurassic World" crossover and excluded it — that was a mistake. Atla Palani is original Dominaria United Commander content (set `dmc`), not licensed IP, and is restored here. All 4 sampled images are legitimate: Atla Palani, Nest Tender, Meren of Clan Nel Toth, Dragon's Rage Channeler, Plaguecrafter.)*
 
 **Anatomy/silhouette:** ragged, minimal leather/wrap clothing baring midriff or shoulders, wild unkempt hair, postures that are hunched, crouched, or reaching low toward the ground or a ritual object rather than standing tall.
 
