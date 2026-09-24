@@ -3155,6 +3155,14 @@ async function applyFramePreset(presetName) {
 			notify(presetName + ' failed to load.', 5);
 			return;
 		}
+		// replay Frame Group + Pack + "Load Frame Version", if saved (older presets won't have these fields — skip this phase for them)
+		if (preset.frameGroup && preset.framePack) {
+			document.querySelector('#selectFrameGroup').value = preset.frameGroup;
+			await loadScriptAsync('/js/frames/group' + preset.frameGroup + '.js');
+			document.querySelector('#selectFramePack').value = preset.framePack;
+			await loadScriptAsync('/js/frames/pack' + preset.framePack + '.js');
+			await document.querySelector('#loadFrameVersion').onclick();
+		}
 		// frame stack
 		document.querySelector('#frame-list').innerHTML = null;
 		card.frames = JSON.parse(JSON.stringify(preset.frames));
