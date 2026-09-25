@@ -17,9 +17,11 @@ Before drafting any prompt, silently answer four questions. This is a private re
 
 Every prompt must name the physical, in-world source of its light explicitly: a candle, a spell's own glow, moonlight through a specific gap, forge fire, an energy burst, bioluminescence, etc. Never write "dramatic lighting," "moody lighting," or any other lighting descriptor that doesn't point to a physical source in the scene.
 
-State the falloff explicitly: say what stays crisp and legible close to the source, and what recedes into shadow or haze as distance from it increases. This is what sells the light as real and also does the compositional work of Rule 5 — the falloff is what naturally darkens the areas meant to be cropped.
+State the falloff explicitly: say what stays crisp and legible close to the source, and what recedes into shadow or haze as distance from it increases. This is what sells the light as real and gives the background depth without it competing with the subject.
 
 When two magic effects or two colors of magic share the frame (e.g. a white ward colliding with a black corruption), state explicitly that they are kept visually distinct from one another — different color temperature, different texture of glow, different edge quality — so the two effects don't visually blend into one indistinct wash.
+
+**High-key exception:** not every scene wants strong falloff into shadow. When the reference tone is bright and even throughout (a luminous, high-key subject rather than a moody one), say so explicitly and drop the shadow-heavy language — e.g. "diffuse warm daylight glowing evenly... with only gentle, shallow shadow... no hard falloff, no dark side, the whole figure stays legible and bright." Defaulting to strong rim-light-with-shadow phrasing when the intended result is bright and even will make the output darker and moodier than intended.
 
 ## 3. Intricacy rule
 
@@ -33,17 +35,21 @@ State 2-3 dominant colors as an explicit, named short list — e.g. "deep reds, 
 
 Never leave the palette open-ended. Phrases like "vibrant colors," "rich colors," or "a striking palette" are banned — they give the image model no actual constraint and produce inconsistent results across a batch.
 
-## 5. Framing for card crop
+## 5. Framing: full subject, contained, no crop zone
 
-Every prompt must state, in this exact phrasing pattern, where the subject sits in the frame and why the rest is deliberately expendable:
+**Corrected 2026-09-24** — the previous version of this rule (a portrait `5:7` full-bleed with a "expendable" top/bottom zone meant to be cropped by the title bar/text box) was built on an assumption about the target app's frame system that turned out to be wrong, confirmed by a real working generation against the actual production app (CardConjurer): the real art box is a fixed, already-correctly-shaped rectangle — you compose to fit inside it, nothing gets cropped after the fact.
 
-> "composition composed so the [subject/most detailed part] sits within the vertical middle band of the frame, roughly between 20% and 65% down from the top, well clear of both the top 15% and bottom 35% of the image — [upper area] fading into plain dark atmosphere, expendable space meant to be cropped by the title bar; [lower area] fading into shadow, expendable space meant to be cropped by the text box."
+Every prompt must state, in this pattern, that the full subject is contained with margin, not bled to the edge:
 
-Fill in `[subject/most detailed part]` with the specific focal element (e.g. "the creature's face and clawed hand," "the blade's inscribed fuller") and `[upper area]` / `[lower area]` with what's actually receding there (e.g. "smoke and rafters above," "loose stone and shadow below"). Use this pattern verbatim in every card prompt across every type skill — other skills and the orchestrator quote this exact phrasing, so it must not be paraphrased or shortened.
+> "[subject], entirely contained within the frame with an even roughly 20% margin of background visible on all four sides, not cropped at any edge."
+
+When the subject has a part that's easy to lose (wingtips, a weapon's far end, a tail), name that part explicitly as also fully visible — don't rely on "entirely contained" alone to protect it. A described decisive moment that's inherently a close-up event (a blade's tip touching a surface, a hand gripping a hilt) will pull the camera in tight and crop out other important features unless you explicitly state the camera is pulled back far enough to show the whole subject, both ends, in one shot.
+
+Use this pattern in every card prompt across every type skill — paraphrase the specific subject/parts named, but keep the "fully contained... not cropped" structure, since it's the load-bearing instruction against the model's default tendency to crop tight on whatever's most detailed.
 
 ## 6. Framing tightness
 
-Default to a close-up or medium-tight shot with a visible pocket of dim surrounding environment left in frame — not an extreme, edge-to-edge close-up that fills the entire canvas with the subject. The card crop needs real, undetailed space to eat into at the top and bottom (per Rule 5); an edge-to-edge composition leaves nothing for the crop to consume without cutting into the subject itself.
+Default to a shot that shows the complete subject with visible breathing room on all sides (per Rule 5) — not an extreme, edge-to-edge close-up that crops off any part of the subject, and not so wide that the subject reads as small/incidental in the frame. A useful target: roughly a 20% margin of background on each side, subject filling the rest.
 
 ## 7. Body-part continuity gotcha
 
@@ -64,6 +70,10 @@ Fixes, apply together when a large single-blade weapon is the focal object:
 
 **Don't overcorrect into a boring weapon either.** The fix above is about grounding geometry, not stripping away character. Keep the weapon fantastical and specific — unusual cross-guard shapes, exotic materials, engraved motifs, an asymmetric silhouette, gemstones, a curved or hooked profile — the ornamentation is exactly what makes it feel like *this* card's weapon and not a generic sword. The trick is to hang all of that invention on a **base type and size a person could plausibly swing**: pick a real weapon category as the starting silhouette (longsword, greatsword, glaive, war-scythe, halberd) and keep its proportions in that category's real range, rather than inventing an exaggerated scale ("a blade taller than she is") as the fantasy element. Once the base type and size read as functionally wieldable, decorate freely — the elaboration should live in material, engraving, and silhouette detail, not in physically implausible proportions.
 
+## 7c. Fused/composite-material object silhouette gotcha
+
+The same root failure as Rule 7b (large blades) applies to any object built from multiple visually distinct materials fused together (a scepter head combining bone, horn, and scale; a staff topped with mixed metals) — it reliably renders as a vague, blended texture-blob with no coherent shape when the prompt describes the *materials* without ever naming the object's actual *silhouette*. Before describing what each material zone looks like, name the shape itself in one concrete term (a leaf-blade, a disc, a trefoil with N distinct lobes, a tapered spike) — then assign materials to specific named parts of that shape (e.g. "a trefoil head, three lobes radiating from one point... one lobe carved bone-white, one lobe blackened horn, one lobe bronze scale, each lobe keeping a clean edge where it meets the others"). Materials described without a named silhouette first, or materials described as "fusing" or "converging" without a stated shape for what they converge into, are what produces the blob.
+
 ## 8. Banned words
 
 The following words are banned as mid-scene description, anywhere in the body of the prompt: **epic, majestic, dramatic, stunning, breathtaking, mystical, ethereal, awe-inspiring**. They are empty intensifiers that give the image model no concrete visual instruction and are a strong signal of generic AI-fantasy prose.
@@ -74,7 +84,9 @@ Exception: exactly one of these words is allowed once, as a single terminal atmo
 
 Every prompt ends with this fixed suffix, held constant per deck:
 
-`Painterly digital fantasy illustration, Magic: The Gathering [artifact] card art style, [2-4 word atmosphere tag], high detail. --ar 5:7`
+`Painterly digital fantasy illustration, Magic: The Gathering [artifact] card art style, [2-4 word atmosphere tag], high detail. --ar 4:3`
+
+(`--ar 4:3` is the confirmed-working default for this app's art box — corrected 2026-09-24 from an earlier, wrong `5:7` assumption. A type skill may still state its own override for a genuinely different physical format, the way `battle/SKILL.md` does for landscape siege cards.)
 
 Replace `[artifact]` with the card's type-appropriate noun where relevant (or drop the bracket entirely if the type skill's convention doesn't use it), and `[2-4 word atmosphere tag]` with a short mood phrase — this is the one place the single banned-word exception from Rule 8 may land.
 

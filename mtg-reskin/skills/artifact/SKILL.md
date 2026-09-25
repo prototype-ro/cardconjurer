@@ -33,21 +33,21 @@ Five modes cover almost every well-regarded MTG artifact illustration. Naming th
 
 A color-shift or a single glow is not depth. Give the object visible history: engraved reliefs that tell a micro-story (tiny figures being pulled under, a tally of names too small to read), an unusual material choice (serpents forming the stem, a frieze wrapping the bowl), wear patterns. The object should reward a second look, not just catch the eye once.
 
-## Step 4 — Framing for full-art card crop
+## Step 4 — Framing: full object, contained, no crop zone
 
-A printed full-art card's title bar covers roughly the top 10-15% of the image and the text box covers roughly the bottom 35-40%. The actual visible "art window" is the middle band — roughly 20% to 65% down from the top. State this explicitly and with real percentages in every prompt:
+**Corrected 2026-09-24** — per art-template Rule 5, the app's actual art box is a fixed rectangle you compose to fit inside, not a full-bleed image that gets cropped by overlaid title/text elements. State the object as fully contained with margin, not bled to the edge:
 
-> "composition composed so the [subject/most detailed part] sits within the vertical middle band of the frame, roughly between 20% and 65% down from the top, well clear of both the top 15% and bottom 35% of the image — [upper area] fading into plain dark atmosphere, expendable space meant to be cropped by the title bar; [lower area] fading into shadow, expendable space meant to be cropped by the text box."
+> "[object], entirely contained within the frame with an even roughly 20% margin of background visible on all four sides, not cropped at any edge."
 
-Just saying "kept clear of the top/bottom edge" is not enough — it tells the model what to avoid, not where the composition's actual weight should concentrate.
+If the object has a part on the opposite side of the frame from the decisive-moment action (e.g. a scepter's head, when the action is its tip touching the ground), name that part explicitly as also fully visible, and state the camera is pulled back far enough to show both ends in one shot — a described close-up action will otherwise pull the whole composition into a tight crop and cut off the rest of the object.
 
-## Step 5 — Framing tightness: close-up, not extreme close-up
+## Step 5 — Framing tightness: full object with room to breathe, not extreme close-up
 
-Extreme, edge-to-edge close-ups fix genericness but overcorrect into claustrophobic results that fight the art-window crop (no negative space left for the title bar / text box to eat into). Default to "close-up, medium-tight shot" with a visible pocket of dim surrounding environment around the object, not "extreme close-up... nothing else in frame." The object should still be the clear focal point — it just needs room to breathe.
+Extreme, edge-to-edge close-ups fix genericness but crop off parts of the object that should be visible per Step 4. Default to a shot that shows the complete object with a visible margin of environment around it, not "extreme close-up... nothing else in frame." The object should still be the clear focal point — it just needs room to breathe and needs to be whole.
 
 ## Technical settings currently in use
 
-- Aspect ratio: `--ar 5:7`
+- Aspect ratio: `--ar 4:3` (corrected 2026-09-24 from an earlier, wrong `5:7` assumption — confirmed working against the actual app)
 - Palette discipline: 2-3 dominant colors per piece (e.g. warm gold + blood-red + near-black), not a full rainbow — this is what makes tight/limited-palette pieces read as intentional rather than washed out.
 - Avoid stacking multiple "near-black / crushing shadow" phrases — always pair dark atmosphere with an explicit legible-detail instruction on the focal point ("that glow the single strongest light source... spilling warm highlights across [subject] while [background] fades to near-black").
 - If a creature/figure's own limb or body part is transforming, describe it as ONE continuous body part, never as "gripping/holding" a separate limb — the engine misreads that as two distinct objects.
