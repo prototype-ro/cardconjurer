@@ -29,6 +29,8 @@ Give the subject visible history, not a clean, freshly-rendered surface. This me
 
 The test: the prompt should reward a second look with a new detail, not just register once at a glance. A generic "ornate" or "detailed" adjective does not satisfy this rule — the detail has to be a specific, nameable thing.
 
+**The specific detail doesn't have to be on the subject — it often works better in the surroundings.** Confirmed 2026-09-27: a subject correctly grounded on pose, geometry, and lighting but with no specific detail anywhere still read as generic stock art (any dark-winged figure on a hill), even though nothing was technically wrong with it. Etching a detail onto the subject itself (scars, tally-marks, engravings) is one option, but a single surprising, incongruous object in the environment — one item in a pile of otherwise-expected debris that doesn't belong, a distant silhouette, the specific remains of a past event — reads as more surprising and does more to make the scene feel like *this* character's specific history rather than a type. When in doubt, put the specific detail in what surrounds the subject, not just on it.
+
 ## 4. Palette discipline
 
 State 2-3 dominant colors as an explicit, named short list — e.g. "deep reds, aged gold, near-black shadows" or "bone white, oxidized copper-green, ink black." This list is what keeps a faction's cards visually cohesive across a whole deck.
