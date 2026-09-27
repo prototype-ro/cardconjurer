@@ -51,6 +51,12 @@ Use this pattern in every card prompt across every type skill — paraphrase the
 
 Default to a shot that shows the complete subject with visible breathing room on all sides (per Rule 5) — not an extreme, edge-to-edge close-up that crops off any part of the subject, and not so wide that the subject reads as small/incidental in the frame. A useful target: roughly a 20% margin of background on each side, subject filling the rest.
 
+## 6b. No dead-frontal, symmetrical stance — ever
+
+**Added 2026-09-27**, after comparing a grid of real published Magic cards side by side: not one of them shows a subject standing straight-on, weight even, body symmetrical — including the calmest, most "static portrait" cards in the sample. Even a still, composed figure is three-quarter turned, weight shifted onto one leg, wings held asymmetrically, or shot from a slightly low/off-axis camera angle. "Static" in Magic art means *held in a moment*, not *standing straight* — a dead-frontal symmetrical pose reads as stiff and lifeless regardless of how much other detail surrounds it.
+
+This applies even to Rule 10's actor-in-a-still-moment cases and to any "static dominant pose" instruction elsewhere in this skill set (e.g. planeswalkers, a composed/reading demon, a seated figure) — state a specific asymmetry explicitly: which leg carries the weight, which way the head or shoulders turn, which wing sits higher than the other, or what the camera angle is relative to the subject. Never leave a "calm" or "still" pose undescribed and default to frontal symmetry.
+
 ## 7. Body-part continuity gotcha
 
 If a figure's own limb or body part is transforming into, fusing with, or growing an object (a hand becoming a blade, an arm sprouting bark), describe it as one single continuous part — e.g. "an arm that ends in a jagged crystal blade, the crystal growing directly from the forearm." Never phrase this as the figure "gripping," "holding," or "wielding" a separate object, even if that's visually similar to what you intend — the image model reads "gripping X" as two distinct objects (a hand, and a separate item), which breaks the fused/transforming read entirely.
