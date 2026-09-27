@@ -3153,7 +3153,19 @@ function captureTextStyles() {
 	});
 	return textStyles;
 }
+function summarizeTextStyles(textStyles) {
+	return Object.entries(textStyles)
+		.filter(([key, style]) => Object.keys(style).length > 0)
+		.map(([key, style]) => key + ': ' + Object.entries(style).map(([field, value]) => field + '=' + value).join(', '))
+		.join('\n');
+}
 async function saveFramePreset() {
+	var textStylesToSave = captureTextStyles();
+	var textStylesSummary = summarizeTextStyles(textStylesToSave);
+	var previewMessage = textStylesSummary
+		? 'This preset will save the following text styling:\n\n' + textStylesSummary + '\n\nContinue?'
+		: 'This preset will save no text styling overrides (every textbox is at its frame default). Continue?';
+	if (!confirm(previewMessage)) {return null;}
 	var presetName = prompt('Enter the name you would like to save this frame preset under:');
 	if (!presetName) {return null;}
 	presetName = presetName.trim();
@@ -3179,7 +3191,7 @@ async function saveFramePreset() {
 			frameGroup: lastLoadedFrameGroup,
 			framePack: lastLoadedFramePack,
 			frames: framesToSave,
-			textStyles: captureTextStyles()
+			textStyles: textStylesToSave
 		};
 		await cardDB.set(presetName, presetToSave, 'framePresets');
 		loadAvailableFramePresets();
