@@ -3084,6 +3084,39 @@ async function addFrame(additionalMasks = [], loadingFrame = false) {
 	document.querySelector('#frame-list').prepend(frameElement);
 	bottomInfoEdited();
 }
+// Color and shadow can also be set via inline {codes} typed directly into
+// the text (e.g. {fontcolor#fff}, {shadowcolor#000}{shadowx0}{shadowy6}
+// {shadowblur8}) — writeText() only ever reassigns local variables while
+// parsing those, never writes them back onto the textObject, so reading
+// textObject.color/.shadow* alone misses anything set this way. This
+// converts the raw-pixel shadow values inline codes use back to the
+// normalized (0-1 of card width/height) units the persisted fields use, via
+// the inverse of scaleWidth()/scaleHeight(). Deliberately scoped to just
+// color + shadow — no font/align/outline/kerning.
+function parseInlineColorAndShadow(text) {
+	var style = {};
+	var tokens = (text || '').match(/\{[^}]*\}/g) || [];
+	tokens.forEach(token => {
+		var raw = token.slice(1, -1);
+		var code = raw.toLowerCase();
+		if (code.includes('fontcolor')) {
+			style.color = raw.replace(/fontcolor/i, '');
+		} else if (code.includes('shadowcolor')) {
+			style.shadow = raw.replace(/shadowcolor/i, '');
+		} else if (code.includes('shadowblur')) {
+			style.shadowBlur = (parseInt(code.replace('shadowblur', '')) || 0) / card.height;
+		} else if (code.includes('shadowx')) {
+			style.shadowX = (parseInt(code.replace('shadowx', '')) || 0) / card.width;
+		} else if (code.includes('shadowy')) {
+			style.shadowY = (parseInt(code.replace('shadowy', '')) || 0) / card.height;
+		} else if (code.includes('shadow')) {
+			var offset = parseInt(code.replace('shadow', '')) || 0;
+			style.shadowX = offset / card.width;
+			style.shadowY = offset / card.height;
+		}
+	});
+	return style;
+}
 async function saveFramePreset() {
 	var presetName = prompt('Enter the name you would like to save this frame preset under:');
 	if (!presetName) {return null;}
@@ -3106,17 +3139,26 @@ async function saveFramePreset() {
 			delete frame.image;
 			frame.masks.forEach(mask => delete mask.image);
 		});
-		var textColors = {};
+		var textStyles = {};
 		Object.entries(card.text || {}).forEach(([key, textObject]) => {
-			if (textObject.color !== undefined) {
-				textColors[key] = textObject.color;
+			var style = {};
+			['color', 'shadow', 'shadowX', 'shadowY', 'shadowBlur'].forEach(field => {
+				if (textObject[field] !== undefined) {
+					style[field] = textObject[field];
+				}
+			});
+			// Inline-code values reflect what's actually visible right now, so they
+			// take priority over the (possibly stale) persisted defaults above.
+			Object.assign(style, parseInlineColorAndShadow(textObject.text));
+			if (Object.keys(style).length > 0) {
+				textStyles[key] = style;
 			}
 		});
 		var presetToSave = {
 			frameGroup: lastLoadedFrameGroup,
 			framePack: lastLoadedFramePack,
 			frames: framesToSave,
-			textColors: textColors
+			textStyles: textStyles
 		};
 		await cardDB.set(presetName, presetToSave, 'framePresets');
 		loadAvailableFramePresets();
@@ -3171,10 +3213,10 @@ async function applyFramePreset(presetName) {
 		card.frames.reverse();
 		await card.frames.forEach(item => addFrame([], item));
 		card.frames.reverse();
-		// text color only
-		Object.entries(preset.textColors || {}).forEach(([key, color]) => {
+		// text color + shadow only
+		Object.entries(preset.textStyles || {}).forEach(([key, style]) => {
 			if (card.text[key]) {
-				card.text[key].color = color;
+				Object.assign(card.text[key], style);
 			}
 		});
 		drawTextBuffer();
