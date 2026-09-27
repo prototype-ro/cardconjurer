@@ -13,6 +13,14 @@ Before drafting any prompt, silently answer four questions. This is a private re
 - **Why**: The visual metaphor chosen for What must map onto the card's actual mechanic (what it does in the rules) or the deck's lore (its place in the faction's story) — never decoration chosen because it looks nice in isolation. If you can't state which mechanic or lore beat the image is dramatizing, the concept isn't ready.
 - **Where**: Establish the setting and a diegetic light source (see Rule 2) together, and position that light source relative to the framing band described in Rule 5 — the light source is part of staging the shot, not an afterthought added after the composition is set.
 
+## 1b. Never use invented lore proper nouns as visual shorthand
+
+**Added 2026-09-27.** This project's worldbuilding invents proper nouns for factions, species, and named figures (e.g. faction names ending in invented roots, a corruptor's name, a character's name). These names exist for the deck's own internal reference — the naming skill, the theme/lore doc, conversation with the person building the deck — and carry rich visual meaning *to people who already know the lore*. The image-generation model does not know the lore. It has never seen these words and cannot expand "a figure of [invented faction name]" into "pale, silver-robed, precise bearing" — it either ignores the unknown word entirely or, worse, treats it as a nonsense token that degrades the rest of the prompt.
+
+**Every actual image-generation prompt must spell out the physical/visual description in plain descriptive language, in full, every time — never rely on an invented lore name to carry that meaning.** Write "a pale, silver-robed winged figure with precise, disciplined bearing," not "an Aelathir." Write "a massive, battle-scarred dragon with weathered bone-pale and ember-red scales," not "a Valdrakyr." This applies even when the same visual description has already been spelled out earlier in the same conversation or an earlier prompt for the same faction — each prompt is a fresh, standalone instruction to the model with no memory of prior ones, so the description must be complete on its own every single time.
+
+Invented proper nouns belong in card *names*, flavor text, and this project's own internal lore documents — never inside the descriptive body of an actual art-generation prompt.
+
 ## 2. Diegetic lighting rule
 
 Every prompt must name the physical, in-world source of its light explicitly: a candle, a spell's own glow, moonlight through a specific gap, forge fire, an energy burst, bioluminescence, etc. Never write "dramatic lighting," "moody lighting," or any other lighting descriptor that doesn't point to a physical source in the scene.
