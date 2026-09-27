@@ -3106,10 +3106,17 @@ async function saveFramePreset() {
 			delete frame.image;
 			frame.masks.forEach(mask => delete mask.image);
 		});
+		var textColors = {};
+		Object.entries(card.text || {}).forEach(([key, textObject]) => {
+			if (textObject.color !== undefined) {
+				textColors[key] = textObject.color;
+			}
+		});
 		var presetToSave = {
 			frameGroup: lastLoadedFrameGroup,
 			framePack: lastLoadedFramePack,
-			frames: framesToSave
+			frames: framesToSave,
+			textColors: textColors
 		};
 		await cardDB.set(presetName, presetToSave, 'framePresets');
 		loadAvailableFramePresets();
@@ -3164,6 +3171,13 @@ async function applyFramePreset(presetName) {
 		card.frames.reverse();
 		await card.frames.forEach(item => addFrame([], item));
 		card.frames.reverse();
+		// text color only
+		Object.entries(preset.textColors || {}).forEach(([key, color]) => {
+			if (card.text[key]) {
+				card.text[key].color = color;
+			}
+		});
+		drawTextBuffer();
 		return true;
 	} catch (error) {
 		notify('Failed to apply frame preset "' + presetName + '" (' + error.message + ').');
