@@ -119,6 +119,14 @@ Only add `--no <specific clutter terms>` when several generations in a row have 
 - **One bridging element ties both halves into a single moment.** A raised weapon, an upturned face, a shared shadow, a beam of light crossing both zones — without it, a two-part composition reads as two pictures stacked, not one instant.
 - **Total detail budget is fixed regardless of element count.** Rule 3's "one specific detail" budget was calibrated for a solo subject. A scene with an actor, a reactor, an environment, and a bridging element divides that same attention across all of them — over-detailing one element starves the others and collapses the composition back toward a portrait of just that one thing (see the second point above).
 
+## 10b. Multi-source effects need a distinct third color and explicit directionality
+
+**Added 2026-09-30**, after a two-actor scene (each character independently repelling their own piece of a shared external threat) kept reading as one character simply absorbing power into her own body, despite the prompt saying the opposite.
+
+- **A shared external threat/effect needs its own color or substance, distinct from either actor's own effect.** If character A's magic and an incoming threat are both left unspecified or share a palette, the generator collapses them into a single effect belonging to whichever character's look is already well-established in the prompt — it will not infer a third, separate thing from context alone.
+- **State the direction of force explicitly when it matters.** "Energy erupts outward from her hand, pushing away from her body, repelling the threat back the direction it came from" reads correctly; a vaguer clause like "a ribbon of energy streams toward" leaves the direction ambiguous, and the model has no strong prior that an ally's effect near a foreign threat means repulsion rather than the character drawing that threat toward or into herself.
+- This applies any time two or more entities in a scene are each doing something to (or against) a shared third element — always name that third element's own distinct color, and always state which way each force is moving.
+
 ## 11. No text, frames, or artist names
 
 The described art must never include literal text, letters, numbers, card frames, borders, or any UI element — the art is the illustration only, not a mockup of the finished card. Do not name any living artist to steer style (no "in the style of [artist]"); every stylistic result must come from the conventions in this file (lighting, palette, intricacy, framing) rather than borrowing a named artist's signature look.
